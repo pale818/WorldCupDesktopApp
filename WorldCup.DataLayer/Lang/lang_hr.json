@@ -1,0 +1,16 @@
+﻿{
+  "title": "Svjetsko Prvenstvo Aplikacija",
+  "gender": "Spol",
+  "language": "Jezik",
+  "favoriteTeam": "Omiljeni Tim",
+  "favoritePlayer": "Omiljeni Igrač",
+  "loadMatches": "Učitaj Utakmice",
+  "loadPlayers": "Učitaj Igrače",
+  "addToFavorites": "Dodaj u Favorite",
+  "remove": "Ukloni",
+  "country": "Država",
+  "listOfMatches": "Popis Utakmica",
+  "listOfPlayers": "Popis Igrača",
+  "noMatchesFound": "Nema pronađenih utakmica za odabrani tim.",
+  "matchLoadError": "Greška pri učitavanju utakmica. Pokušajte ponovno kasnije."
+}
