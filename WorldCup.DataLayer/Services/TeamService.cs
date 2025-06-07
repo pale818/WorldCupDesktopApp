@@ -47,7 +47,7 @@ public class TeamService
             if (_config.Settings.DataSource == "local")
             {
                 var file = $"./Data/{gender}_teams.json";
-                Console.WriteLine($"[GetTeamsAsync] Local file: {file}");
+                System.Diagnostics.Debug.WriteLine($"[GetTeamsAsync] Local file: {file}");
 
                 if (File.Exists(file))
                 {
@@ -55,29 +55,31 @@ public class TeamService
                     return JsonSerializer.Deserialize<List<Team>>(json, _jsonOptions) ?? new();
                 }
 
-                Console.WriteLine("[GetTeamsAsync] Local file not found.");
+                System.Diagnostics.Debug.WriteLine("[GetTeamsAsync] Local file not found.");
                 return new(); // empty list fallback
             }
 
             var url = $"{BaseUrl(gender)}/teams";
-            Console.WriteLine($"[GetTeamsAsync] API URL: {url}");
+            System.Diagnostics.Debug.WriteLine($"[GetTeamsAsync] API URL: {url}");
 
             var response = await _httpClient.GetStringAsync(url);
+            System.Diagnostics.Debug.WriteLine($"response: { response}");
+
             return JsonSerializer.Deserialize<List<Team>>(response, _jsonOptions) ?? new();
         }
         catch (HttpRequestException httpEx)
         {
-            Console.WriteLine("HTTP request error: " + httpEx.Message);
+            System.Diagnostics.Debug.WriteLine("HTTP request error: " + httpEx.Message);
             throw new Exception("Failed to retrieve teams. Network issue or server is unreachable.");
         }
         catch (JsonException jsonEx)
         {
-            Console.WriteLine("Deserialization error: " + jsonEx.Message);
+            System.Diagnostics.Debug.WriteLine("Deserialization error: " + jsonEx.Message);
             throw new Exception("Failed to parse team data. Server response format may be incorrect.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Unexpected error: " + ex.Message);
+            System.Diagnostics.Debug.WriteLine("Unexpected error: " + ex.Message);
             throw new Exception("An unexpected error occurred while loading teams.");
         }
     }

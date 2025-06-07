@@ -113,6 +113,7 @@
             btnPlayers.TabIndex = 6;
             btnPlayers.Text = "Load Players";
             btnPlayers.UseVisualStyleBackColor = true;
+            btnPlayers.Click += btnPlayers_Click;
             // 
             // btnMatches
             // 
@@ -122,6 +123,7 @@
             btnMatches.TabIndex = 7;
             btnMatches.Text = "Load Matches";
             btnMatches.UseVisualStyleBackColor = true;
+            btnMatches.Click += btnMatches_Click;
             // 
             // btnRemoveTeam
             // 
@@ -131,6 +133,7 @@
             btnRemoveTeam.TabIndex = 8;
             btnRemoveTeam.Text = "Remove Team";
             btnRemoveTeam.UseVisualStyleBackColor = true;
+            btnRemoveTeam.Click += btnRemoveTeam_Click;
             // 
             // btnAddTeam
             // 

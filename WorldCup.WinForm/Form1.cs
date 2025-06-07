@@ -58,7 +58,7 @@ namespace WorldCup.WinForm
             cmbGender.Items.AddRange(new[] { "men", "women" });
             cmbGender.SelectedItem = _configService.Settings.Gender;
 
-            cmbLang.Items.AddRange(new[] { "hr", "hr" });
+            cmbLang.Items.AddRange(new[] { "en", "hr" });
             cmbLang.SelectedItem = _configService.Settings.Language;
 
 
@@ -70,21 +70,37 @@ namespace WorldCup.WinForm
             //loading teams in combo box Country
             await LoadTeams();
 
+            // ensure to load favourite teams into the list of fav teams
+            var favTeamFile = "./Data/favourite_teams.txt";
+            if (File.Exists(favTeamFile))
+            {
+                var lines = File.ReadAllLines(favTeamFile);
+                foreach (var team in lines)
+                {
+                    lstFavTeam.Items.Add(team);
+                }
+            }
+
+
+            //load favourite players
+
+
+
         }
+
+
+        //panel drag and drop functions
 
 
         //changes the names of lables,buttons etc based on lang
         private void ApplyLocalization()
         {
-            System.Diagnostics.Debug.WriteLine("ApplyLocalization: _localizationService: " + _localizationService);
 
             if (_localizationService == null) return;
 
             this.Text = _localizationService["title"];
             lblGender.Text = _localizationService["gender"];
             lblLang.Text = _localizationService["language"];
-            System.Diagnostics.Debug.WriteLine("ApplyLocalization: title: " + _localizationService["title"]);
-
             lblFavTeam.Text = _localizationService["favoriteTeam"];
             lblFavPlayers.Text = _localizationService["favoritePlayer"];
             btnMatches.Text = _localizationService["loadMatches"];
@@ -134,7 +150,7 @@ namespace WorldCup.WinForm
 
         }
 
-        private void cmbGender_SelectedIndexChanged(object sender, EventArgs e)
+        private async void cmbGender_SelectedIndexChanged(object sender, EventArgs e)
         {
             // if (_suppressGenderSave) return;
 
@@ -144,8 +160,11 @@ namespace WorldCup.WinForm
             if (!string.IsNullOrEmpty(selectedGender))
             {
                 _configService.Settings.Gender = selectedGender;
-                _configService.Save(); // persist to settings.json
+                _configService.Save(); //saves last value of gender to  file
             }
+
+            // call backend now
+            await LoadTeams();
         }
 
 
@@ -198,7 +217,6 @@ namespace WorldCup.WinForm
 
                 // Ensure Data folder exists
                 Directory.CreateDirectory("./Data");
-
                 // Save favorite teams
                 File.WriteAllLines("./Data/favourite_teams.txt", lstFavTeam.Items.Cast<string>());
             }
@@ -209,9 +227,91 @@ namespace WorldCup.WinForm
         }
 
 
+        //REMOVE FAV TEAMS
+        private void btnRemoveTeam_Click(object sender, EventArgs e)
+        {
+
+
+            var selectedIndex = lstFavTeam.SelectedIndex;
+
+
+            //-1 is if the list is empty
+            if (selectedIndex == -1)
+            {
+                MessageBox.Show("Select a team to remove.");
+                return;
+            }
+
+            // Remove from UI
+            lstFavTeam.Items.RemoveAt(selectedIndex);
+
+            // Save updated list to disk
+            Directory.CreateDirectory("./Data");
+            File.WriteAllLines("./Data/favourite_teams.txt", lstFavTeam.Items.Cast<string>());
+
+        }
+
+
+        //LOAD MATCHES BUTTON
+        private async void btnMatches_Click(object sender, EventArgs e)
+        {
+            // fetch from cmbGender value, converts into string and in case nothing is found takes "man"
+            var gender = cmbGender.SelectedItem?.ToString() ?? "men";
+
+
+            // takes from cmbCountry value
+            var selectedTeam = cmbCountry.SelectedItem?.ToString();
+            // if no team is selected in cmbCountry exits
+            if (string.IsNullOrEmpty(selectedTeam)) return;
+
+
+            // extracts fifaCode from the string, splits by "-" and takes first part (e.g. CRO-Croatia, only CRO)
+            var fifaCode = selectedTeam.Split('-')[0].Trim();
+
+
+            try
+            {
+                // fetches all matches for specific gender and team and saves it to _matches list
+                _matches = await _matchService.GetMatchesForTeamAsync(gender, fifaCode);
+
+                if (_matches.Count == 0)
+                {
+                    MessageBox.Show(_localizationService["noMatchesFound"]);
+
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(_localizationService["matchLoadError"]);
+                System.Diagnostics.Debug.WriteLine("LoadMatches error: " + ex.Message);
+                return;
+            }
+
+            // clears list 
+            lstMatches.Items.Clear();
+
+            // fills list of matches 
+            foreach (var match in _matches)
+            {
+                lstMatches.Items.Add($"{match.StageName}: {match.HomeTeamCountry} vs {match.AwayTeamCountry}");
+            }
+        }
+
+
+        //LOAD PLAYERS BUTTON
+        private void btnPlayers_Click(object sender, EventArgs e)
+        {
+
+        }
 
 
 
+
+
+
+
+       
 
         //LIST OF MATCHES
 
@@ -236,5 +336,7 @@ namespace WorldCup.WinForm
         {
 
         }
+
+       
     }
 }
