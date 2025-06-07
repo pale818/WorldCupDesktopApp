@@ -5,6 +5,8 @@ namespace WorldCup.Data.Services;
 
 public class ConfigService
 {
+
+    //used to "remeber" the last chosen gender,lang.....
     private const string ConfigPath = "settings.json"; // adjust path if needed
 
     public ConfigSettings Settings { get; private set; }
@@ -23,6 +25,8 @@ public class ConfigService
         }
     }
 
+
+    //saves the current values in settings obj to json form
     public void Save()
     {
         var json = JsonSerializer.Serialize(Settings, new JsonSerializerOptions { WriteIndented = true });

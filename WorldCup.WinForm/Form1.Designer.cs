@@ -38,8 +38,8 @@
             btnMatches = new Button();
             btnRemoveTeam = new Button();
             btnAddTeam = new Button();
-            listBox1 = new ListBox();
-            listBox2 = new ListBox();
+            lstMatches = new ListBox();
+            lstFavTeam = new ListBox();
             lblMatchesList = new Label();
             lblFavTeam = new Label();
             flpPlayers = new FlowLayoutPanel();
@@ -62,14 +62,14 @@
             cmbCountry.FormattingEnabled = true;
             cmbCountry.Location = new Point(230, 41);
             cmbCountry.Name = "cmbCountry";
-            cmbCountry.Size = new Size(115, 28);
+            cmbCountry.Size = new Size(158, 28);
             cmbCountry.TabIndex = 1;
             cmbCountry.SelectedIndexChanged += cmbCountry_SelectedIndexChanged;
             // 
             // lblGender
             // 
             lblGender.AutoSize = true;
-            lblGender.Location = new Point(51, 18);
+            lblGender.Location = new Point(51, 19);
             lblGender.Name = "lblGender";
             lblGender.Size = new Size(57, 20);
             lblGender.TabIndex = 2;
@@ -79,7 +79,7 @@
             // lblCountry
             // 
             lblCountry.AutoSize = true;
-            lblCountry.Location = new Point(257, 18);
+            lblCountry.Location = new Point(257, 19);
             lblCountry.Name = "lblCountry";
             lblCountry.Size = new Size(60, 20);
             lblCountry.TabIndex = 3;
@@ -98,17 +98,18 @@
             // lblLang
             // 
             lblLang.AutoSize = true;
-            lblLang.Location = new Point(883, 18);
+            lblLang.Location = new Point(883, 19);
             lblLang.Name = "lblLang";
             lblLang.Size = new Size(74, 20);
             lblLang.TabIndex = 5;
             lblLang.Text = "Language";
+            lblLang.Click += lblLang_Click;
             // 
             // btnPlayers
             // 
-            btnPlayers.Location = new Point(22, 138);
+            btnPlayers.Location = new Point(22, 139);
             btnPlayers.Name = "btnPlayers";
-            btnPlayers.Size = new Size(132, 29);
+            btnPlayers.Size = new Size(133, 29);
             btnPlayers.TabIndex = 6;
             btnPlayers.Text = "Load Players";
             btnPlayers.UseVisualStyleBackColor = true;
@@ -124,7 +125,7 @@
             // 
             // btnRemoveTeam
             // 
-            btnRemoveTeam.Location = new Point(513, 318);
+            btnRemoveTeam.Location = new Point(513, 317);
             btnRemoveTeam.Name = "btnRemoveTeam";
             btnRemoveTeam.Size = new Size(259, 29);
             btnRemoveTeam.TabIndex = 8;
@@ -139,27 +140,30 @@
             btnAddTeam.TabIndex = 9;
             btnAddTeam.Text = "Add Favourite Team";
             btnAddTeam.UseVisualStyleBackColor = true;
+            btnAddTeam.Click += btnAddTeam_Click;
             // 
-            // listBox1
+            // lstMatches
             // 
-            listBox1.FormattingEnabled = true;
-            listBox1.Location = new Point(513, 84);
-            listBox1.Name = "listBox1";
-            listBox1.Size = new Size(259, 144);
-            listBox1.TabIndex = 10;
+            lstMatches.FormattingEnabled = true;
+            lstMatches.Location = new Point(513, 84);
+            lstMatches.Name = "lstMatches";
+            lstMatches.Size = new Size(259, 144);
+            lstMatches.TabIndex = 10;
+            lstMatches.SelectedIndexChanged += lstMatches_SelectedIndexChanged;
             // 
-            // listBox2
+            // lstFavTeam
             // 
-            listBox2.FormattingEnabled = true;
-            listBox2.Location = new Point(513, 366);
-            listBox2.Name = "listBox2";
-            listBox2.Size = new Size(259, 144);
-            listBox2.TabIndex = 11;
+            lstFavTeam.FormattingEnabled = true;
+            lstFavTeam.Location = new Point(513, 365);
+            lstFavTeam.Name = "lstFavTeam";
+            lstFavTeam.Size = new Size(259, 144);
+            lstFavTeam.TabIndex = 11;
+            lstFavTeam.SelectedIndexChanged += lstFavTeam_SelectedIndexChanged;
             // 
             // lblMatchesList
             // 
             lblMatchesList.AutoSize = true;
-            lblMatchesList.Location = new Point(519, 242);
+            lblMatchesList.Location = new Point(519, 243);
             lblMatchesList.Name = "lblMatchesList";
             lblMatchesList.Size = new Size(108, 20);
             lblMatchesList.TabIndex = 12;
@@ -168,7 +172,7 @@
             // lblFavTeam
             // 
             lblFavTeam.AutoSize = true;
-            lblFavTeam.Location = new Point(516, 521);
+            lblFavTeam.Location = new Point(517, 521);
             lblFavTeam.Name = "lblFavTeam";
             lblFavTeam.Size = new Size(109, 20);
             lblFavTeam.TabIndex = 13;
@@ -176,17 +180,19 @@
             // 
             // flpPlayers
             // 
-            flpPlayers.Location = new Point(22, 194);
+            flpPlayers.Location = new Point(22, 195);
             flpPlayers.Name = "flpPlayers";
             flpPlayers.Size = new Size(250, 125);
             flpPlayers.TabIndex = 14;
+            flpPlayers.Paint += flpPlayers_Paint;
             // 
             // flpFavPlayers
             // 
-            flpFavPlayers.Location = new Point(22, 386);
+            flpFavPlayers.Location = new Point(22, 387);
             flpFavPlayers.Name = "flpFavPlayers";
             flpFavPlayers.Size = new Size(250, 124);
             flpFavPlayers.TabIndex = 15;
+            flpFavPlayers.Paint += flpFavPlayers_Paint;
             // 
             // lblPlayers
             // 
@@ -200,7 +206,7 @@
             // lblFavPlayers
             // 
             lblFavPlayers.AutoSize = true;
-            lblFavPlayers.Location = new Point(26, 518);
+            lblFavPlayers.Location = new Point(26, 517);
             lblFavPlayers.Name = "lblFavPlayers";
             lblFavPlayers.Size = new Size(120, 20);
             lblFavPlayers.TabIndex = 17;
@@ -217,8 +223,8 @@
             Controls.Add(flpPlayers);
             Controls.Add(lblFavTeam);
             Controls.Add(lblMatchesList);
-            Controls.Add(listBox2);
-            Controls.Add(listBox1);
+            Controls.Add(lstFavTeam);
+            Controls.Add(lstMatches);
             Controls.Add(btnAddTeam);
             Controls.Add(btnRemoveTeam);
             Controls.Add(btnMatches);
@@ -231,6 +237,7 @@
             Controls.Add(cmbGender);
             Name = "Form1";
             Text = "Form1";
+            Load += Form1_Load;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -247,8 +254,8 @@
         private Button btnMatches;
         private Button btnRemoveTeam;
         private Button btnAddTeam;
-        private ListBox listBox1;
-        private ListBox listBox2;
+        private ListBox lstMatches;
+        private ListBox lstFavTeam;
         private Label lblMatchesList;
         private Label lblFavTeam;
         private FlowLayoutPanel flpPlayers;

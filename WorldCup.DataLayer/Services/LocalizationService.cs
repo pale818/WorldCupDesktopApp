@@ -24,8 +24,8 @@ namespace WorldCup.Data.Services
             {
                 _translations = new(); // Fallback
             }
-            System.Diagnostics.Debug.WriteLine("Path: " + path);
-            System.Diagnostics.Debug.WriteLine(("Exists: " + File.Exists(path)));
+            //System.Diagnostics.Debug.WriteLine("Path: " + path);
+            //System.Diagnostics.Debug.WriteLine(("Exists: " + File.Exists(path)));
         }
 
         public string this[string key] => _translations?.ContainsKey(key) == true ? _translations[key] : key;
