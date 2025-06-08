@@ -1,0 +1,20 @@
+﻿<Window x:Class="WorldCup.WPF.StartupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WorldCup.WPF"
+        mc:Ignorable="d"
+        Title="StatupWindow" Height="450" Width="800">
+    <Grid>
+        <StackPanel Margin="20" VerticalAlignment="Center">
+            <TextBlock Text="Choose display mode:" Margin="0,0,0,10"/>
+            <ComboBox x:Name="cmbResolution" Width="200" Margin="0,0,0,10">
+                <ComboBoxItem Content="1024x768" />
+                <ComboBoxItem Content="1280x800" />
+                <ComboBoxItem Content="Fullscreen" />
+            </ComboBox>
+            <Button Content="Continue" Width="120" Click="Continue_Click" HorizontalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</Window>
