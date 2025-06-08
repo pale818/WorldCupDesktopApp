@@ -13,6 +13,8 @@ namespace WorldCup.WinForm
         private MatchService _matchService;
         private SettingsService _settingsService;
         private LocalizationService _localizationService;
+        private ContextMenuStrip _favoritePlayerContextMenu;
+
 
 
         // lists
@@ -34,6 +36,12 @@ namespace WorldCup.WinForm
         {
             InitializeComponent();
             _localizationService = new LocalizationService();
+
+            flpPlayers.DragEnter += Panel_DragEnter;
+            flpFavPlayers.DragEnter += Panel_DragEnter;
+
+            flpPlayers.DragDrop += PanelPlayers_DragDrop;
+            flpFavPlayers.DragDrop += PanelFavoritePlayers_DragDrop;
 
         }
 
@@ -70,7 +78,9 @@ namespace WorldCup.WinForm
             //loading teams in combo box Country
             await LoadTeams();
 
-            // ensure to load favourite teams into the list of fav teams
+
+
+            // ensure to load favourite teams from txt file into the list of fav teams
             var favTeamFile = "./Data/favourite_teams.txt";
             if (File.Exists(favTeamFile))
             {
@@ -82,7 +92,27 @@ namespace WorldCup.WinForm
             }
 
 
-            //load favourite players
+            //LOAD FAV PLAYERS
+
+            //getting players from txt file
+            _favoritePlayers = _settingsService.LoadFavoritePlayers();
+
+            
+            flpFavPlayers.Controls.Clear();
+
+            //
+            foreach(var p in _favoritePlayers)
+            {
+
+                var pControl = new PlayerControl(p,true);
+                pControl.Margin = new Padding(5);
+                pControl.ContextMenuStrip = _favoritePlayerContextMenu; 
+
+
+                flpFavPlayers.Controls.Add(pControl);
+
+                
+            }
 
 
 
@@ -90,6 +120,85 @@ namespace WorldCup.WinForm
 
 
         //panel drag and drop functions
+
+        
+        //when you first click on the panel
+        private void Panel_DragEnter(object sender, DragEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"DRAG ENTER e {e}");
+
+            //check if the selected item is PlayerControl type
+            if (e.Data.GetDataPresent(typeof(PlayerControl)))
+                e.Effect = DragDropEffects.Move;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        //detection of moving the panel 
+        private void PlayerControl_MouseDown(object sender, MouseEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"MOUSE DOWN e {e}");
+
+            if (e.Button == MouseButtons.Left)
+            {
+                this.DoDragDrop(this, DragDropEffects.Move);
+            }
+        }
+
+        //when the panel is "dropped" in the favourite box below
+        private void PanelFavoritePlayers_DragDrop(object sender, DragEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"DRAG DROP e {e}");
+
+            if (e.Data != null && e.Data.GetData(typeof(PlayerControl)) is PlayerControl control)
+            {
+                flpPlayers.Controls.Remove(control);
+                flpFavPlayers.Controls.Add(control);
+                control.ContextMenuStrip = _favoritePlayerContextMenu;
+
+                // Update favorite list
+                var player = control.PlayerData;
+                if (!_favoritePlayers.Any(p => p.Name == player.Name))
+                    _favoritePlayers.Add(player);
+
+                _settingsService.SaveFavoritePlayers(_favoritePlayers);
+            }
+        }
+
+
+        //drag from favourite and return to original box
+        private void PanelPlayers_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data != null && e.Data.GetData(typeof(PlayerControl)) is PlayerControl control)
+            {
+                var player = control.PlayerData;
+
+                // Check if player is in the original match list
+                bool existsInMatch = _allPlayersInMatch.Any(p => p.Name == player.Name);
+                if (!existsInMatch)
+                {
+                    MessageBox.Show("This player doesn't belong to the current match.");
+                    return;
+                }
+
+                // Avoid duplicates
+                if (!flpPlayers.Controls.Contains(control))
+                {
+                    flpFavPlayers.Controls.Remove(control);
+                    flpPlayers.Controls.Add(control);
+                }
+
+                control.SetFavourite(false);
+                control.ContextMenuStrip = null;
+
+                // Update favorite list
+                _favoritePlayers.RemoveAll(p => p.Name == player.Name);
+                _settingsService.SaveFavoritePlayers(_favoritePlayers);
+            }
+        }
+
+
+
 
 
         //changes the names of lables,buttons etc based on lang
@@ -302,7 +411,49 @@ namespace WorldCup.WinForm
         //LOAD PLAYERS BUTTON
         private void btnPlayers_Click(object sender, EventArgs e)
         {
+            var selectedIndex = lstMatches.SelectedIndex;
+            if (selectedIndex == -1) return;
 
+            var selectedMatch = _matches[selectedIndex];
+
+            TeamStatistics stats = null;
+
+            stats = selectedMatch.HomeTeamStatistics;
+            /*
+            if (cmbTeamSide.SelectedItem?.ToString() == "Home")
+            {
+                stats = selectedMatch.HomeTeamStatistics;
+            }
+            else if (cmbTeamSide.SelectedItem?.ToString() == "Away")
+            {
+                stats = selectedMatch.AwayTeamStatistics;
+            }
+            */
+
+            if (stats == null)
+            {
+                MessageBox.Show("No statistics available for this match/side.");
+                return;
+            }
+
+            // Store full list for later comparisons
+            // to do check ?
+            _allPlayersInMatch = stats.StartingEleven.Concat(stats.Substitutes).ToList();
+
+            // DO NOT clear panelFavoritePlayers — it contains your favorites already
+            flpPlayers.Controls.Clear();
+
+            foreach (var player in stats.StartingEleven.Concat(stats.Substitutes))
+            {
+                bool isFavorite = _favoritePlayers.Any(p => p.Name == player.Name);
+
+                // Skip adding to main list if it's already in favorites
+                if (isFavorite) continue;
+
+                var playerControl = new PlayerControl(player, isFavorite);
+                playerControl.Margin = new Padding(5);
+                flpPlayers.Controls.Add(playerControl);
+            }
         }
 
 

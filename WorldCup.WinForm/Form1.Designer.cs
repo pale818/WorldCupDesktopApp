@@ -183,17 +183,23 @@
             // 
             // flpPlayers
             // 
+            flpPlayers.AllowDrop = true;
+            flpPlayers.AutoScroll = true;
+            flpPlayers.BorderStyle = BorderStyle.FixedSingle;
             flpPlayers.Location = new Point(22, 195);
             flpPlayers.Name = "flpPlayers";
-            flpPlayers.Size = new Size(250, 125);
+            flpPlayers.Size = new Size(445, 125);
             flpPlayers.TabIndex = 14;
             flpPlayers.Paint += flpPlayers_Paint;
             // 
             // flpFavPlayers
             // 
+            flpFavPlayers.AllowDrop = true;
+            flpFavPlayers.AutoScroll = true;
+            flpFavPlayers.BorderStyle = BorderStyle.FixedSingle;
             flpFavPlayers.Location = new Point(22, 387);
             flpFavPlayers.Name = "flpFavPlayers";
-            flpFavPlayers.Size = new Size(250, 124);
+            flpFavPlayers.Size = new Size(445, 124);
             flpFavPlayers.TabIndex = 15;
             flpFavPlayers.Paint += flpFavPlayers_Paint;
             // 

@@ -28,10 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            lblPlayerInfo = new Label();
+            SuspendLayout();
+            // 
+            // lblPlayerInfo
+            // 
+            lblPlayerInfo.AutoSize = true;
+            lblPlayerInfo.Location = new Point(89, 17);
+            lblPlayerInfo.Name = "lblPlayerInfo";
+            lblPlayerInfo.Size = new Size(50, 20);
+            lblPlayerInfo.TabIndex = 0;
+            lblPlayerInfo.Text = "label1";
+            lblPlayerInfo.Click += lblPlayerInfo_Click;
+            // 
+            // PlayerControl
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.Info;
+            Controls.Add(lblPlayerInfo);
+            Name = "PlayerControl";
+            Size = new Size(365, 49);
+            Load += PlayerControl_Load;
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
+
+        private Label lblPlayerInfo;
     }
 }

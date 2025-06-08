@@ -6,7 +6,7 @@ namespace WorldCup.Data.Services;
 public class SettingsService
 {
     private const string FavoritePlayersPath = "favorites.json";
-    private const string FavoriteTeamPath = "favorite_team.txt";
+    //private const string FavoriteTeamPath = "favorite_team.txt";
     private const string ConfigPath = "app_config.json";
 
 
@@ -34,19 +34,20 @@ public class SettingsService
     }
 
     // Load favorite team FIFA code
-    public string LoadFavoriteTeam()
+    /*public string LoadFavoriteTeam()
     {
         return File.Exists(FavoriteTeamPath)
             ? File.ReadAllText(FavoriteTeamPath)
-            : "CRO"; // default fallback
-    }
+            : ""; // default fallback
+    }*/
+
 
     // Save favorite team FIFA code
-    public void SaveFavoriteTeam(string fifaCode)
+   /* public void SaveFavoriteTeam(string fifaCode)
     {
         File.WriteAllText(FavoriteTeamPath, fifaCode);
     }
-
+   */
 
 
 
