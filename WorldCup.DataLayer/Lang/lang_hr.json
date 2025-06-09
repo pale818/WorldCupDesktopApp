@@ -12,5 +12,13 @@
   "listOfMatches": "Popis Utakmica",
   "listOfPlayers": "Popis Igrača",
   "noMatchesFound": "Nema pronađenih utakmica za odabrani tim.",
-  "matchLoadError": "Greška pri učitavanju utakmica. Pokušajte ponovno kasnije."
+  "matchLoadError": "Greška pri učitavanju utakmica. Pokušajte ponovno kasnije.",
+  "addFavoriteTeam": "Dodaj Omiljeni Tim",
+  "removeFavoritePlayer": "Ukloni Omiljenog Igrača",
+  "teamInfo": "Informacije o Timu",
+  "favoriteTeamsHeader": "Omiljeni Timovi",
+  "favoritePlayersHeader": "Omiljeni Igrači",
+  "matchesHeader": "Utakmice",
+  "playersHeader": "Igrači",
+  "playerLayoutHeader": "Raspored Igrača"
 }

@@ -27,7 +27,26 @@ namespace WorldCup.WinForm
 
             lblPlayerInfo.Text = $"{PlayerData.ShirtNumber} - {PlayerData.Name} ({PlayerData.Position})" +
             (PlayerData.Captain ? " 🧢" : "");
-            //picStar.Visible = isFavorite;
+
+            // try to find player image
+            string fileName = PlayerData.Name.ToLower().Replace(" ", "_") + ".jpg";
+            string fullPath = Path.Combine("Assets", fileName);
+            string fallbackPath = Path.Combine("Assets", "personDefault.jpg");
+
+            if (File.Exists(fullPath))
+            {
+                using (var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read))
+                {
+                    playerImage.Image = new Bitmap(Image.FromStream(stream));
+                }
+            }
+            else 
+            {
+                using (var stream = new FileStream(fallbackPath, FileMode.Open, FileAccess.Read))
+                {
+                    playerImage.Image = new Bitmap(Image.FromStream(stream));
+                }
+            }
 
             this.MouseDown += PlayerControl_MouseDown;
             this.MouseMove += PlayerControl_MouseMove;

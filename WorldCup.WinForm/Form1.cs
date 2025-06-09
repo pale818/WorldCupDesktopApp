@@ -43,6 +43,10 @@ namespace WorldCup.WinForm
             flpPlayers.DragDrop += PanelPlayers_DragDrop;
             flpFavPlayers.DragDrop += PanelFavoritePlayers_DragDrop;
 
+
+            this.DragEnter += MainForm_DragEnter;
+            this.DragDrop += MainForm_DragDrop;
+
         }
 
 
@@ -113,6 +117,10 @@ namespace WorldCup.WinForm
 
                 
             }
+
+
+
+
 
 
 
@@ -198,6 +206,37 @@ namespace WorldCup.WinForm
         }
 
 
+        private void MainForm_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(typeof(PlayerControl)))
+                e.Effect = DragDropEffects.Move;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void MainForm_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data != null && e.Data.GetData(typeof(PlayerControl)) is PlayerControl control)
+            {
+                var player = control.PlayerData;
+
+                // Check if it's currently in favorites
+                if (control.IsFavourite)
+                {
+                    flpFavPlayers.Controls.Remove(control);
+
+                    control.SetFavourite(false);
+                    control.ContextMenuStrip = null;
+
+                    _favoritePlayers.RemoveAll(p => p.Name == player.Name);
+                    _settingsService.SaveFavoritePlayers(_favoritePlayers);
+
+                    MessageBox.Show($"{player.Name} removed from favorites.");
+                    loadPlayers();
+                }
+            }
+        }
+
 
 
 
@@ -213,6 +252,7 @@ namespace WorldCup.WinForm
             lblFavTeam.Text = _localizationService["favoriteTeam"];
             lblFavPlayers.Text = _localizationService["favoritePlayer"];
             btnMatches.Text = _localizationService["loadMatches"];
+            btnPlayers.Text = _localizationService["loadPlayers"];
             btnAddTeam.Text = _localizationService["addToFavorites"];
             btnRemoveTeam.Text = _localizationService["remove"];
             lblCountry.Text = _localizationService["country"];
@@ -411,6 +451,11 @@ namespace WorldCup.WinForm
         //LOAD PLAYERS BUTTON
         private void btnPlayers_Click(object sender, EventArgs e)
         {
+            loadPlayers();
+        }
+
+        private void loadPlayers()
+        {
             var selectedIndex = lstMatches.SelectedIndex;
             if (selectedIndex == -1) return;
 
@@ -418,7 +463,16 @@ namespace WorldCup.WinForm
 
             TeamStatistics stats = null;
 
+            // detect does selected team belongs to HomeTeam or AwayTeam
             stats = selectedMatch.HomeTeamStatistics;
+            var fifaCode = cmbCountry.SelectedItem?.ToString().Split('-')[0].Trim();
+            System.Diagnostics.Debug.WriteLine($"fifaCode ${fifaCode}");
+
+            if (selectedMatch.AwayTeam.Code == fifaCode)
+            {
+                stats = selectedMatch.AwayTeamStatistics;
+            }
+
             /*
             if (cmbTeamSide.SelectedItem?.ToString() == "Home")
             {
@@ -437,7 +491,6 @@ namespace WorldCup.WinForm
             }
 
             // Store full list for later comparisons
-            // to do check ?
             _allPlayersInMatch = stats.StartingEleven.Concat(stats.Substitutes).ToList();
 
             // DO NOT clear panelFavoritePlayers — it contains your favorites already
@@ -457,12 +510,18 @@ namespace WorldCup.WinForm
         }
 
 
+        //FOR CLOSING
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to exit?", "Exit Confirmation",
+    MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
 
+            if (result == DialogResult.No)
+            {
+                e.Cancel = true; // prevent closing
+            }
+        }
 
-
-
-
-       
 
         //LIST OF MATCHES
 

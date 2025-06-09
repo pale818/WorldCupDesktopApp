@@ -29,27 +29,39 @@
         private void InitializeComponent()
         {
             lblPlayerInfo = new Label();
+            playerImage = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)playerImage).BeginInit();
             SuspendLayout();
             // 
             // lblPlayerInfo
             // 
             lblPlayerInfo.AutoSize = true;
-            lblPlayerInfo.Location = new Point(89, 17);
+            lblPlayerInfo.Location = new Point(3, 32);
             lblPlayerInfo.Name = "lblPlayerInfo";
             lblPlayerInfo.Size = new Size(50, 20);
             lblPlayerInfo.TabIndex = 0;
             lblPlayerInfo.Text = "label1";
             lblPlayerInfo.Click += lblPlayerInfo_Click;
             // 
+            // playerImage
+            // 
+            playerImage.Location = new Point(273, 3);
+            playerImage.Name = "playerImage";
+            playerImage.Size = new Size(89, 78);
+            playerImage.TabIndex = 1;
+            playerImage.TabStop = false;
+            // 
             // PlayerControl
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Info;
+            Controls.Add(playerImage);
             Controls.Add(lblPlayerInfo);
             Name = "PlayerControl";
-            Size = new Size(365, 49);
+            Size = new Size(365, 84);
             Load += PlayerControl_Load;
+            ((System.ComponentModel.ISupportInitialize)playerImage).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -57,5 +69,6 @@
         #endregion
 
         private Label lblPlayerInfo;
+        private PictureBox playerImage;
     }
 }

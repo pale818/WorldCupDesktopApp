@@ -67,7 +67,25 @@ namespace WorldCup.WPF
             cmbLanguage.SelectionChanged += CmbLanguage_SelectionChanged;
             btnTeamInfo.Click += BtnTeamInfo_Click;
 
+            this.Closing += MainWindow_Closing;
+            this.Loaded += MainWindow_Loaded;
+        }
 
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            await LoadTeams();
+            LoadFavoriteTeams();
+            LoadFavoritePlayers();
+        }
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to exit?", "Exit Confirmation",
+                MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.No)
+            {
+                e.Cancel = true;
+            }
         }
 
 
@@ -244,6 +262,22 @@ namespace WorldCup.WPF
             Directory.CreateDirectory("./Data");
             File.WriteAllLines("./Data/favourite_teams.txt", lstFavouriteTeams.Items.Cast<string>());
         }
+
+
+        private void LoadFavoriteTeams()
+        {
+            lstFavouriteTeams.Items.Clear();
+            var path = "./Data/favourite_teams.txt";
+            if (File.Exists(path))
+            {
+                var teams = File.ReadAllLines(path);
+                foreach (var t in teams)
+                    lstFavouriteTeams.Items.Add(t);
+            }
+        }
+
+
+
 
 
         //ADDS AND REMOVES FAVOURITE PLAYERS AND SAVES THE STATE TO FILE
