@@ -20,5 +20,9 @@
   "favoritePlayersHeader": "Favorite Players",
   "matchesHeader": "Matches",
   "playersHeader": "Players",
-  "playerLayoutHeader": "Player Layout"
+  "playerLayoutHeader": "Player Layout",
+  "cancel": "Cancel",
+  "save": "Save",
+  "settings": "Settings"
+
 }

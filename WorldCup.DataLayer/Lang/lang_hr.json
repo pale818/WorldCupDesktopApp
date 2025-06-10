@@ -20,5 +20,9 @@
   "favoritePlayersHeader": "Omiljeni Igrači",
   "matchesHeader": "Utakmice",
   "playersHeader": "Igrači",
-  "playerLayoutHeader": "Raspored Igrača"
+  "playerLayoutHeader": "Raspored Igrača",
+  "cancel": "Poništi",
+  "save": "Spremi",
+  "settings": "Postavke"
+
 }

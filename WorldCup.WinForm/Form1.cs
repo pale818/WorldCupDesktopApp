@@ -47,6 +47,9 @@ namespace WorldCup.WinForm
             this.DragEnter += MainForm_DragEnter;
             this.DragDrop += MainForm_DragDrop;
 
+            // REMOVES FROM FAV LIST PLAYERS BY CONTEXT MENU
+            _favoritePlayerContextMenu = new ContextMenuStrip();
+            _favoritePlayerContextMenu.Items.Add("Remove from Favorites", null, RemoveFromFavorites_Click);
         }
 
 
@@ -67,11 +70,11 @@ namespace WorldCup.WinForm
 
 
 
-            cmbGender.Items.AddRange(new[] { "men", "women" });
-            cmbGender.SelectedItem = _configService.Settings.Gender;
+            //cmbGender.Items.AddRange(new[] { "men", "women" });
+            //cmbGender.SelectedItem = _configService.Settings.Gender;
 
-            cmbLang.Items.AddRange(new[] { "en", "hr" });
-            cmbLang.SelectedItem = _configService.Settings.Language;
+            //cmbLang.Items.AddRange(new[] { "en", "hr" });
+            //cmbLang.SelectedItem = _configService.Settings.Language;
 
 
             //LoadLang creates a dictionary based on lang
@@ -101,35 +104,28 @@ namespace WorldCup.WinForm
             //getting players from txt file
             _favoritePlayers = _settingsService.LoadFavoritePlayers();
 
-            
+
             flpFavPlayers.Controls.Clear();
 
             //
-            foreach(var p in _favoritePlayers)
+            foreach (var p in _favoritePlayers)
             {
 
-                var pControl = new PlayerControl(p,true);
+                var pControl = new PlayerControl(p, true);
                 pControl.Margin = new Padding(5);
-                pControl.ContextMenuStrip = _favoritePlayerContextMenu; 
+                pControl.ContextMenuStrip = _favoritePlayerContextMenu;
 
 
                 flpFavPlayers.Controls.Add(pControl);
 
-                
+
             }
-
-
-
-
-
-
-
         }
 
 
         //panel drag and drop functions
 
-        
+
         //when you first click on the panel
         private void Panel_DragEnter(object sender, DragEventArgs e)
         {
@@ -247,8 +243,6 @@ namespace WorldCup.WinForm
             if (_localizationService == null) return;
 
             this.Text = _localizationService["title"];
-            lblGender.Text = _localizationService["gender"];
-            lblLang.Text = _localizationService["language"];
             lblFavTeam.Text = _localizationService["favoriteTeam"];
             lblFavPlayers.Text = _localizationService["favoritePlayer"];
             btnMatches.Text = _localizationService["loadMatches"];
@@ -258,6 +252,8 @@ namespace WorldCup.WinForm
             lblCountry.Text = _localizationService["country"];
             lblMatchesList.Text = _localizationService["listOfMatches"];
             lblPlayers.Text = _localizationService["listOfPlayers"];
+            btnSettings.Text = _localizationService["settings"];
+
 
 
             this.Invalidate();
@@ -269,7 +265,8 @@ namespace WorldCup.WinForm
         //based on choosen gender "Country" combo box is filled with teams 
         private async Task LoadTeams()
         {
-            var gender = cmbGender.SelectedItem?.ToString() ?? "men";
+            _configService = new ConfigService();
+            var gender = _configService.Settings.Gender;
 
             try
             {
@@ -289,33 +286,34 @@ namespace WorldCup.WinForm
         }
 
 
+        private void RemoveFromFavorites_Click(object sender, EventArgs e)
+        {
+            // The 'sender' is the ToolStripMenuItem that was clicked.
+            // Its 'Owner' property will be the ContextMenuStrip.
+            // The 'SourceControl' property of the ContextMenuStrip will be the PlayerControl that was right-clicked.
+            if (sender is ToolStripItem menuItem && menuItem.Owner is ContextMenuStrip contextMenu)
+            {
+                if (contextMenu.SourceControl is PlayerControl playerControl)
+                {
+                    var player = playerControl.PlayerData;
+
+                    // Perform the same logic as when dragging a player out of favorites
+                    flpFavPlayers.Controls.Remove(playerControl);
+
+                    playerControl.SetFavourite(false);
+                    playerControl.ContextMenuStrip = null; // Remove context menu as it's no longer a favorite
+
+                    _favoritePlayers.RemoveAll(p => p.Name == player.Name);
+                    _settingsService.SaveFavoritePlayers(_favoritePlayers);
+
+                    MessageBox.Show($"{player.Name} removed from favorites via context menu.");
+                    loadPlayers(); // Refresh the main players panel
+                }
+            }
+        }
+
 
         //************************************************************************************//
-
-
-        //GENDER
-        private void lblGender_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private async void cmbGender_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // if (_suppressGenderSave) return;
-
-            var selectedGender = cmbGender.SelectedItem?.ToString();
-            System.Diagnostics.Debug.WriteLine("selectedGender: " + selectedGender);
-
-            if (!string.IsNullOrEmpty(selectedGender))
-            {
-                _configService.Settings.Gender = selectedGender;
-                _configService.Save(); //saves last value of gender to  file
-            }
-
-            // call backend now
-            await LoadTeams();
-        }
-
 
 
 
@@ -330,28 +328,6 @@ namespace WorldCup.WinForm
 
         }
 
-
-        //LANGUAGE
-        private void cmbLang_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            var selectedLanguage = cmbLang.SelectedItem?.ToString();
-            System.Diagnostics.Debug.WriteLine("selectedLanguage: " + selectedLanguage);
-
-            if (!string.IsNullOrEmpty(selectedLanguage))
-            {
-                _configService.Settings.Language = selectedLanguage;
-                _configService.Save(); // Saves to settings.json
-
-                _localizationService.LoadLanguage(selectedLanguage);
-                System.Diagnostics.Debug.WriteLine("_localizationService: " + _localizationService);
-                ApplyLocalization();
-
-            }
-        }
-        private void lblLang_Click(object sender, EventArgs e)
-        {
-
-        }
 
 
         //ADD TEAM 
@@ -405,7 +381,8 @@ namespace WorldCup.WinForm
         private async void btnMatches_Click(object sender, EventArgs e)
         {
             // fetch from cmbGender value, converts into string and in case nothing is found takes "man"
-            var gender = cmbGender.SelectedItem?.ToString() ?? "men";
+            _configService = new ConfigService();
+            var gender = _configService.Settings.Gender;
 
 
             // takes from cmbCountry value
@@ -523,6 +500,25 @@ namespace WorldCup.WinForm
         }
 
 
+        private async void btnSettings_Click(object sender, EventArgs e)
+        {
+            using (var form = new SettingsForm())
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    // refresh UI
+                    System.Diagnostics.Debug.WriteLine("REFRESH UI");
+
+
+                    _configService = new ConfigService();
+                    _localizationService = new LocalizationService();
+                    _localizationService.LoadLanguage(_configService.Settings.Language);
+                    ApplyLocalization();
+                    await LoadTeams();
+                }
+            }
+        }
+
         //LIST OF MATCHES
 
         private void lstMatches_SelectedIndexChanged(object sender, EventArgs e)
@@ -547,6 +543,6 @@ namespace WorldCup.WinForm
 
         }
 
-       
+
     }
 }

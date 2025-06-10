@@ -28,12 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            cmbGender = new ComboBox();
             cmbCountry = new ComboBox();
-            lblGender = new Label();
             lblCountry = new Label();
-            cmbLang = new ComboBox();
-            lblLang = new Label();
             btnPlayers = new Button();
             btnMatches = new Button();
             btnRemoveTeam = new Button();
@@ -46,16 +42,8 @@
             flpFavPlayers = new FlowLayoutPanel();
             lblPlayers = new Label();
             lblFavPlayers = new Label();
+            btnSettings = new Button();
             SuspendLayout();
-            // 
-            // cmbGender
-            // 
-            cmbGender.FormattingEnabled = true;
-            cmbGender.Location = new Point(22, 40);
-            cmbGender.Name = "cmbGender";
-            cmbGender.Size = new Size(123, 28);
-            cmbGender.TabIndex = 0;
-            cmbGender.SelectedIndexChanged += cmbGender_SelectedIndexChanged;
             // 
             // cmbCountry
             // 
@@ -66,16 +54,6 @@
             cmbCountry.TabIndex = 1;
             cmbCountry.SelectedIndexChanged += cmbCountry_SelectedIndexChanged;
             // 
-            // lblGender
-            // 
-            lblGender.AutoSize = true;
-            lblGender.Location = new Point(51, 19);
-            lblGender.Name = "lblGender";
-            lblGender.Size = new Size(57, 20);
-            lblGender.TabIndex = 2;
-            lblGender.Text = "Gender";
-            lblGender.Click += lblGender_Click;
-            // 
             // lblCountry
             // 
             lblCountry.AutoSize = true;
@@ -85,25 +63,6 @@
             lblCountry.TabIndex = 3;
             lblCountry.Text = "Country";
             lblCountry.Click += lblCountry_Click;
-            // 
-            // cmbLang
-            // 
-            cmbLang.FormattingEnabled = true;
-            cmbLang.Location = new Point(883, 39);
-            cmbLang.Name = "cmbLang";
-            cmbLang.Size = new Size(87, 28);
-            cmbLang.TabIndex = 4;
-            cmbLang.SelectedIndexChanged += cmbLang_SelectedIndexChanged;
-            // 
-            // lblLang
-            // 
-            lblLang.AutoSize = true;
-            lblLang.Location = new Point(883, 19);
-            lblLang.Name = "lblLang";
-            lblLang.Size = new Size(74, 20);
-            lblLang.TabIndex = 5;
-            lblLang.Text = "Language";
-            lblLang.Click += lblLang_Click;
             // 
             // btnPlayers
             // 
@@ -117,7 +76,7 @@
             // 
             // btnMatches
             // 
-            btnMatches.Location = new Point(513, 39);
+            btnMatches.Location = new Point(638, 39);
             btnMatches.Name = "btnMatches";
             btnMatches.Size = new Size(259, 29);
             btnMatches.TabIndex = 7;
@@ -127,7 +86,7 @@
             // 
             // btnRemoveTeam
             // 
-            btnRemoveTeam.Location = new Point(513, 384);
+            btnRemoveTeam.Location = new Point(638, 352);
             btnRemoveTeam.Name = "btnRemoveTeam";
             btnRemoveTeam.Size = new Size(259, 29);
             btnRemoveTeam.TabIndex = 8;
@@ -148,7 +107,7 @@
             // lstMatches
             // 
             lstMatches.FormattingEnabled = true;
-            lstMatches.Location = new Point(513, 84);
+            lstMatches.Location = new Point(638, 84);
             lstMatches.Name = "lstMatches";
             lstMatches.Size = new Size(259, 144);
             lstMatches.TabIndex = 10;
@@ -157,7 +116,7 @@
             // lstFavTeam
             // 
             lstFavTeam.FormattingEnabled = true;
-            lstFavTeam.Location = new Point(519, 430);
+            lstFavTeam.Location = new Point(638, 415);
             lstFavTeam.Name = "lstFavTeam";
             lstFavTeam.Size = new Size(259, 144);
             lstFavTeam.TabIndex = 11;
@@ -166,7 +125,7 @@
             // lblMatchesList
             // 
             lblMatchesList.AutoSize = true;
-            lblMatchesList.Location = new Point(513, 253);
+            lblMatchesList.Location = new Point(638, 248);
             lblMatchesList.Name = "lblMatchesList";
             lblMatchesList.Size = new Size(108, 20);
             lblMatchesList.TabIndex = 12;
@@ -175,7 +134,7 @@
             // lblFavTeam
             // 
             lblFavTeam.AutoSize = true;
-            lblFavTeam.Location = new Point(519, 588);
+            lblFavTeam.Location = new Point(638, 588);
             lblFavTeam.Name = "lblFavTeam";
             lblFavTeam.Size = new Size(109, 20);
             lblFavTeam.TabIndex = 13;
@@ -221,12 +180,23 @@
             lblFavPlayers.TabIndex = 17;
             lblFavPlayers.Text = "Favourite players";
             // 
+            // btnSettings
+            // 
+            btnSettings.Location = new Point(28, 39);
+            btnSettings.Name = "btnSettings";
+            btnSettings.Size = new Size(94, 29);
+            btnSettings.TabIndex = 18;
+            btnSettings.Text = "Settings";
+            btnSettings.UseVisualStyleBackColor = true;
+            btnSettings.Click += btnSettings_Click;
+            // 
             // Form1
             // 
             AllowDrop = true;
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(976, 627);
+            Controls.Add(btnSettings);
             Controls.Add(lblFavPlayers);
             Controls.Add(lblPlayers);
             Controls.Add(flpFavPlayers);
@@ -239,12 +209,8 @@
             Controls.Add(btnRemoveTeam);
             Controls.Add(btnMatches);
             Controls.Add(btnPlayers);
-            Controls.Add(lblLang);
-            Controls.Add(cmbLang);
             Controls.Add(lblCountry);
-            Controls.Add(lblGender);
             Controls.Add(cmbCountry);
-            Controls.Add(cmbGender);
             Name = "Form1";
             Text = "Form1";
             FormClosing += Form1_FormClosing;
@@ -254,13 +220,8 @@
         }
 
         #endregion
-
-        private ComboBox cmbGender;
         private ComboBox cmbCountry;
-        private Label lblGender;
         private Label lblCountry;
-        private ComboBox cmbLang;
-        private Label lblLang;
         private Button btnPlayers;
         private Button btnMatches;
         private Button btnRemoveTeam;
@@ -273,5 +234,6 @@
         private FlowLayoutPanel flpFavPlayers;
         private Label lblPlayers;
         private Label lblFavPlayers;
+        private Button btnSettings;
     }
 }

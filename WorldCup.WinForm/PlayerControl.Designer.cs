@@ -36,7 +36,7 @@
             // lblPlayerInfo
             // 
             lblPlayerInfo.AutoSize = true;
-            lblPlayerInfo.Location = new Point(3, 32);
+            lblPlayerInfo.Location = new Point(3, 27);
             lblPlayerInfo.Name = "lblPlayerInfo";
             lblPlayerInfo.Size = new Size(50, 20);
             lblPlayerInfo.TabIndex = 0;
@@ -45,9 +45,9 @@
             // 
             // playerImage
             // 
-            playerImage.Location = new Point(273, 3);
+            playerImage.Location = new Point(338, 3);
             playerImage.Name = "playerImage";
-            playerImage.Size = new Size(80, 80);
+            playerImage.Size = new Size(76, 72);
             playerImage.SizeMode = PictureBoxSizeMode.StretchImage;
             playerImage.TabIndex = 1;
             playerImage.TabStop = false;
@@ -61,7 +61,7 @@
             Controls.Add(playerImage);
             Controls.Add(lblPlayerInfo);
             Name = "PlayerControl";
-            Size = new Size(417, 88);
+            Size = new Size(417, 77);
             Load += PlayerControl_Load;
             ((System.ComponentModel.ISupportInitialize)playerImage).EndInit();
             ResumeLayout(false);
