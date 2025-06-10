@@ -40,7 +40,7 @@ namespace WorldCup.WinForm
                     playerImage.Image = new Bitmap(Image.FromStream(stream));
                 }
             }
-            else 
+            else
             {
                 using (var stream = new FileStream(fallbackPath, FileMode.Open, FileAccess.Read))
                 {
@@ -87,6 +87,11 @@ namespace WorldCup.WinForm
         }
 
         private void lblPlayerInfo_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void playerImage_Click(object sender, EventArgs e)
         {
 
         }

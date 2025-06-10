@@ -47,9 +47,11 @@
             // 
             playerImage.Location = new Point(273, 3);
             playerImage.Name = "playerImage";
-            playerImage.Size = new Size(89, 78);
+            playerImage.Size = new Size(80, 80);
+            playerImage.SizeMode = PictureBoxSizeMode.StretchImage;
             playerImage.TabIndex = 1;
             playerImage.TabStop = false;
+            playerImage.Click += playerImage_Click;
             // 
             // PlayerControl
             // 
@@ -59,7 +61,7 @@
             Controls.Add(playerImage);
             Controls.Add(lblPlayerInfo);
             Name = "PlayerControl";
-            Size = new Size(365, 84);
+            Size = new Size(417, 88);
             Load += PlayerControl_Load;
             ((System.ComponentModel.ISupportInitialize)playerImage).EndInit();
             ResumeLayout(false);

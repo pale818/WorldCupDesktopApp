@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WorldCup.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="1000">
+        Title="MainWindow">
 
     <Window.Triggers>
         <EventTrigger RoutedEvent="Window.Loaded">
@@ -42,9 +42,9 @@
             <ComboBox x:Name="cmbGender" Width="150"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
+        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,10">
             <Label x:Name="lblFavoriteTeam" Content="Favorite Team:"/>
-            <ComboBox x:Name="cmbFavoriteTeam" Width="100"/>
+            <ComboBox x:Name="cmbFavoriteTeam" Width="150"/>
         </StackPanel>
 
         <GroupBox x:Name="grpFavoritePlayers" Header="Favorite Players" Grid.Row="1" Grid.Column="0" Margin="0,0,10,0">
@@ -54,8 +54,6 @@
                     <Button x:Name="btnAddToFavorites" Content="Add Player" Width="100" Margin="0,0,90,0"/>
                     <Button x:Name="btnRemoveFavoritePlayer" Content="Remove Player" Width="100"/>
                 </StackPanel>
-
-                <Button x:Name="btnTeamInfo" Content="Team Info" Width="290" HorizontalAlignment="Center"/>
             </StackPanel>
         </GroupBox>
 
@@ -67,6 +65,7 @@
                     <Button x:Name="btnAddFavoriteTeam" Content="Add Team" Width="80" Margin="10,0,30,0"/>
                     <Button x:Name="btnRemoveFavoriteTeam" Content="Remove Team" Width="80"/>
                 </StackPanel>
+                <Button x:Name="btnTeamInfo" Content="Team Info" Width="200" HorizontalAlignment="Center"/>
             </StackPanel>
         </GroupBox>
 

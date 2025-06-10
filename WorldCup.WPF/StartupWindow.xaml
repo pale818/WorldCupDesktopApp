@@ -10,9 +10,8 @@
         <StackPanel Margin="20" VerticalAlignment="Center">
             <TextBlock Text="Choose display mode:" Margin="0,0,0,10"/>
             <ComboBox x:Name="cmbResolution" Width="200" Margin="0,0,0,10">
-                <ComboBoxItem Content="1024x768" />
+                <ComboBoxItem Content="960x720" />
                 <ComboBoxItem Content="1280x800" />
-                <ComboBoxItem Content="Fullscreen" />
             </ComboBox>
             <Button Content="Continue" Width="120" Click="Continue_Click" HorizontalAlignment="Center"/>
         </StackPanel>

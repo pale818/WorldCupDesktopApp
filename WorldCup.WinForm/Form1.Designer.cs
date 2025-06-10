@@ -127,7 +127,7 @@
             // 
             // btnRemoveTeam
             // 
-            btnRemoveTeam.Location = new Point(513, 317);
+            btnRemoveTeam.Location = new Point(513, 384);
             btnRemoveTeam.Name = "btnRemoveTeam";
             btnRemoveTeam.Size = new Size(259, 29);
             btnRemoveTeam.TabIndex = 8;
@@ -157,7 +157,7 @@
             // lstFavTeam
             // 
             lstFavTeam.FormattingEnabled = true;
-            lstFavTeam.Location = new Point(513, 365);
+            lstFavTeam.Location = new Point(519, 430);
             lstFavTeam.Name = "lstFavTeam";
             lstFavTeam.Size = new Size(259, 144);
             lstFavTeam.TabIndex = 11;
@@ -166,7 +166,7 @@
             // lblMatchesList
             // 
             lblMatchesList.AutoSize = true;
-            lblMatchesList.Location = new Point(519, 243);
+            lblMatchesList.Location = new Point(513, 253);
             lblMatchesList.Name = "lblMatchesList";
             lblMatchesList.Size = new Size(108, 20);
             lblMatchesList.TabIndex = 12;
@@ -175,7 +175,7 @@
             // lblFavTeam
             // 
             lblFavTeam.AutoSize = true;
-            lblFavTeam.Location = new Point(517, 521);
+            lblFavTeam.Location = new Point(519, 588);
             lblFavTeam.Name = "lblFavTeam";
             lblFavTeam.Size = new Size(109, 20);
             lblFavTeam.TabIndex = 13;
@@ -186,9 +186,9 @@
             flpPlayers.AllowDrop = true;
             flpPlayers.AutoScroll = true;
             flpPlayers.BorderStyle = BorderStyle.FixedSingle;
-            flpPlayers.Location = new Point(22, 195);
+            flpPlayers.Location = new Point(22, 193);
             flpPlayers.Name = "flpPlayers";
-            flpPlayers.Size = new Size(445, 125);
+            flpPlayers.Size = new Size(445, 165);
             flpPlayers.TabIndex = 14;
             flpPlayers.Paint += flpPlayers_Paint;
             // 
@@ -197,16 +197,16 @@
             flpFavPlayers.AllowDrop = true;
             flpFavPlayers.AutoScroll = true;
             flpFavPlayers.BorderStyle = BorderStyle.FixedSingle;
-            flpFavPlayers.Location = new Point(22, 387);
+            flpFavPlayers.Location = new Point(22, 415);
             flpFavPlayers.Name = "flpFavPlayers";
-            flpFavPlayers.Size = new Size(445, 124);
+            flpFavPlayers.Size = new Size(445, 159);
             flpFavPlayers.TabIndex = 15;
             flpFavPlayers.Paint += flpFavPlayers_Paint;
             // 
             // lblPlayers
             // 
             lblPlayers.AutoSize = true;
-            lblPlayers.Location = new Point(30, 327);
+            lblPlayers.Location = new Point(22, 374);
             lblPlayers.Name = "lblPlayers";
             lblPlayers.Size = new Size(100, 20);
             lblPlayers.TabIndex = 16;
@@ -215,7 +215,7 @@
             // lblFavPlayers
             // 
             lblFavPlayers.AutoSize = true;
-            lblFavPlayers.Location = new Point(26, 517);
+            lblFavPlayers.Location = new Point(22, 588);
             lblFavPlayers.Name = "lblFavPlayers";
             lblFavPlayers.Size = new Size(120, 20);
             lblFavPlayers.TabIndex = 17;
@@ -223,9 +223,10 @@
             // 
             // Form1
             // 
+            AllowDrop = true;
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(976, 576);
+            ClientSize = new Size(976, 627);
             Controls.Add(lblFavPlayers);
             Controls.Add(lblPlayers);
             Controls.Add(flpFavPlayers);
