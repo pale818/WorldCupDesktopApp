@@ -23,6 +23,8 @@
   "playerLayoutHeader": "Player Layout",
   "cancel": "Cancel",
   "save": "Save",
-  "settings": "Settings"
+  "settings": "Settings",
+  "stat": "Statistics",
+  "groupInfo":  "Group Statistics table"
 
 }

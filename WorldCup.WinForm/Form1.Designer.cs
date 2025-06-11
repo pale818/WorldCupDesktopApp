@@ -43,6 +43,7 @@
             lblPlayers = new Label();
             lblFavPlayers = new Label();
             btnSettings = new Button();
+            cmbShowTeam = new ComboBox();
             SuspendLayout();
             // 
             // cmbCountry
@@ -190,12 +191,22 @@
             btnSettings.UseVisualStyleBackColor = true;
             btnSettings.Click += btnSettings_Click;
             // 
+            // cmbShowTeam
+            // 
+            cmbShowTeam.FormattingEnabled = true;
+            cmbShowTeam.Location = new Point(186, 140);
+            cmbShowTeam.Name = "cmbShowTeam";
+            cmbShowTeam.Size = new Size(151, 28);
+            cmbShowTeam.TabIndex = 19;
+            cmbShowTeam.SelectedIndexChanged += cmbShowTeam_SelectedIndexChanged;
+            // 
             // Form1
             // 
             AllowDrop = true;
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(976, 627);
+            Controls.Add(cmbShowTeam);
             Controls.Add(btnSettings);
             Controls.Add(lblFavPlayers);
             Controls.Add(lblPlayers);
@@ -235,5 +246,6 @@
         private Label lblPlayers;
         private Label lblFavPlayers;
         private Button btnSettings;
+        private ComboBox cmbShowTeam;
     }
 }

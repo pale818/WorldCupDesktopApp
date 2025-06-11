@@ -23,6 +23,9 @@
   "playerLayoutHeader": "Raspored Igrača",
   "cancel": "Poništi",
   "save": "Spremi",
-  "settings": "Postavke"
+  "settings": "Postavke",
+  "stat" :  "Statistika",
+  "groupInfo": "Tabica za statistiku"
+
 
 }

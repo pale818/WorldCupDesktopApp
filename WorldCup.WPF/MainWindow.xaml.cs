@@ -80,11 +80,10 @@ namespace WorldCup.WPF
             btnLoadMatches.Click += BtnLoadMatches_Click;
             btnLoadPlayers.Click += BtnLoadPlayers_Click;
             btnAddFavoriteTeam.Click += BtnAddFavoriteTeam_Click;
-            //btnRemoveFavoriteTeam.Click += BtnRemoveFavoriteTeam_Click;
-            //btnAddToFavorites.Click += BtnAddToFavoritesPlayer_Click;
-            //btnRemoveFavoritePlayer.Click += BtnRemoveFavoritePlayer_Click;
-            //btnTeamInfo.Click += BtnTeamInfo_Click;
             cmbLanguage.SelectionChanged += CmbLanguage_SelectionChanged;
+
+            btnHomeStat.Click += BtnLoadHomeStat_Click;
+            btnAwayStat.Click += BtnLoadAwayStat_Click;
 
             // Instantiate the ContextMenu
             _favoritePlayerRemoveContextMenu = new ContextMenu();
@@ -123,7 +122,12 @@ namespace WorldCup.WPF
 
             this.Closing += MainWindow_Closing;
             this.Loaded += MainWindow_Loaded;
+
+            // when canvasPlayers detect change in height or width calls DisplayPlayersOnField
+            canvasPlayers.SizeChanged += (s, e) => DisplayPlayersOnField();
+
         }
+
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -142,6 +146,47 @@ namespace WorldCup.WPF
             }
         }
 
+        // STATISTIC WINDOW
+        private void BtnLoadHomeStat_Click(object sender, RoutedEventArgs e)
+        {
+            if (statsHome == null)
+            {
+                MessageBox.Show("No info.");
+                return;
+            }
+
+            try
+            {
+                var statWindow = new Statistics(statsHome);
+                statWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+        }
+
+        private void BtnLoadAwayStat_Click(object sender, RoutedEventArgs e)
+        {
+            if (statsAway == null)
+            {
+                MessageBox.Show("No info.");
+                return;
+            }
+
+            try
+            {
+                var statWindow = new Statistics(statsAway);
+                statWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+        }
+
 
         //CHANGES LABEL,BUTTON ETC. LANGUAGE
         public void ApplyLocalization()
@@ -154,12 +199,8 @@ namespace WorldCup.WPF
             btnLoadMatches.Content = _localizationService["loadMatches"];
             btnLoadPlayers.Content = _localizationService["loadPlayers"];
             btnAddFavoriteTeam.Content = _localizationService["addFavoriteTeam"];
-
-            //btnRemoveFavoriteTeam.Content = _localizationService["remove"];
-            //btnRemoveFavoritePlayer.Content = _localizationService["removeFavoritePlayer"];
-            //btnAddToFavorites.Content = _localizationService["addToFavorites"];
-            //btnTeamInfo.Content = _localizationService["teamInfo"];
-
+            btnHomeStat.Content = _localizationService["stat"];
+            btnAwayStat.Content = _localizationService["stat"];
             miTeamInfo.Header = _localizationService["teamInfo"];
             miRemoveTeam.Header = _localizationService["remove"];
             miAddPlayer.Header = _localizationService["addToFavorites"];
@@ -171,6 +212,7 @@ namespace WorldCup.WPF
             grpMatches.Header = _localizationService["matchesHeader"];
             grpPlayers.Header = _localizationService["playersHeader"];
             grpPlayerLayout.Header = _localizationService["playerLayoutHeader"];
+            grpPlayerLayoutTitle.Header = _localizationService["groupInfo"];
         }
 
 
@@ -286,6 +328,10 @@ namespace WorldCup.WPF
             // Iterate through all players (starting eleven + substitutes)
             foreach (var player in _allPlayersInMatch)
             {
+                // do not add player to the main list since it is in the facourite list
+                bool isFavorite = _favoritePlayers.Any(p => p.Name == player.Name);
+                if (isFavorite) continue;
+
                 // Format the player information as a string
                 string playerInfo = $"{player.ShirtNumber} - {player.Name} ({player.Position})";
                 if (player.Captain)
@@ -300,13 +346,8 @@ namespace WorldCup.WPF
             DisplayPlayersOnField();
         }
 
-        //displays players on green field box
-        private void DisplayPlayersOnField()
-        {
-            RedrawPlayers();
-        }
 
-        private void RedrawPlayers()
+        private void DisplayPlayersOnField()
         {
             canvasPlayers.Children.Clear();
 
@@ -428,8 +469,18 @@ namespace WorldCup.WPF
             if (selectedIndex == -1) return;
 
             var playerName = lstPlayers.SelectedItem.ToString();
-            var player = _allPlayersInMatch.FirstOrDefault(p => p.Name == playerName);
-            if (player == null || _favoritePlayers.Any(p => p.Name == player.Name)) return;
+            System.Diagnostics.Debug.WriteLine($"playerName: {playerName}");
+            if (playerName == null) return;
+
+            var player = _allPlayersInMatch.FirstOrDefault(p => playerName.Contains(p.Name));
+            System.Diagnostics.Debug.WriteLine($"player: {player}");
+
+            if (player == null || _favoritePlayers.Any(p => p.Name == player.Name))
+            {
+                MessageBox.Show("This player is already in the favorite list.");
+                return;
+
+            }
 
             _favoritePlayers.Add(player);
             _settingsService.SaveFavoritePlayers(_favoritePlayers);

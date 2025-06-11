@@ -1,5 +1,6 @@
 using System.Diagnostics.Metrics;
 using System.IO;
+using System.Text.Json;
 using WorldCup.Data.Models;
 using WorldCup.Data.Services;
 
@@ -27,10 +28,10 @@ namespace WorldCup.WinForm
         private ConfigService _configService;
         private AppConfig _appConfig;
 
-
-        // introduced because gender was overwritten 
-        // so to solve this raise condition this var is introduced
-        private bool _suppressGenderSave = false;
+        private TeamStatistics statsHome;
+        private TeamStatistics statsAway;
+        private List<Player> _currentHomePlayers = new();
+        private List<Player> _currentAwayPlayers = new();
 
         public Form1()
         {
@@ -68,15 +69,6 @@ namespace WorldCup.WinForm
             _teamService = new TeamService(_configService);
             _matchService = new MatchService(_configService);
 
-
-
-            //cmbGender.Items.AddRange(new[] { "men", "women" });
-            //cmbGender.SelectedItem = _configService.Settings.Gender;
-
-            //cmbLang.Items.AddRange(new[] { "en", "hr" });
-            //cmbLang.SelectedItem = _configService.Settings.Language;
-
-
             //LoadLang creates a dictionary based on lang
             _localizationService.LoadLanguage(_configService.Settings.Language);
             ApplyLocalization();
@@ -100,30 +92,31 @@ namespace WorldCup.WinForm
 
 
             //LOAD FAV PLAYERS
-
             //getting players from txt file
             _favoritePlayers = _settingsService.LoadFavoritePlayers();
-
-
             flpFavPlayers.Controls.Clear();
 
-            //
+
             foreach (var p in _favoritePlayers)
             {
-
-                var pControl = new PlayerControl(p, true);
-                pControl.Margin = new Padding(5);
-                pControl.ContextMenuStrip = _favoritePlayerContextMenu;
-
-
-                flpFavPlayers.Controls.Add(pControl);
-
+                try
+                {
+                    var pControl = new PlayerControl(p, true);
+                    pControl.Margin = new Padding(5);
+                    pControl.ContextMenuStrip = _favoritePlayerContextMenu;
+                    flpFavPlayers.Controls.Add(pControl);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ERROR {ex}");
+                    // continue to the next player
+                }
 
             }
         }
 
 
-        //panel drag and drop functions
+        //DRAG AND DROP FUNCTIONS:
 
 
         //when you first click on the panel
@@ -433,6 +426,7 @@ namespace WorldCup.WinForm
 
         private void loadPlayers()
         {
+            /*
             var selectedIndex = lstMatches.SelectedIndex;
             if (selectedIndex == -1) return;
 
@@ -450,16 +444,6 @@ namespace WorldCup.WinForm
                 stats = selectedMatch.AwayTeamStatistics;
             }
 
-            /*
-            if (cmbTeamSide.SelectedItem?.ToString() == "Home")
-            {
-                stats = selectedMatch.HomeTeamStatistics;
-            }
-            else if (cmbTeamSide.SelectedItem?.ToString() == "Away")
-            {
-                stats = selectedMatch.AwayTeamStatistics;
-            }
-            */
 
             if (stats == null)
             {
@@ -473,19 +457,123 @@ namespace WorldCup.WinForm
             // DO NOT clear panelFavoritePlayers — it contains your favorites already
             flpPlayers.Controls.Clear();
 
-            foreach (var player in stats.StartingEleven.Concat(stats.Substitutes))
+            foreach (var player in _allPlayersInMatch)
             {
+                // do not add player to the main list since it is in the facourite list
                 bool isFavorite = _favoritePlayers.Any(p => p.Name == player.Name);
-
-                // Skip adding to main list if it's already in favorites
                 if (isFavorite) continue;
 
                 var playerControl = new PlayerControl(player, isFavorite);
                 playerControl.Margin = new Padding(5);
                 flpPlayers.Controls.Add(playerControl);
             }
+            */
+
+            var selectedIndex = lstMatches.SelectedIndex;
+            if (selectedIndex == -1) return;
+
+            var selectedMatch = _matches[selectedIndex];
+            statsHome = selectedMatch.HomeTeamStatistics;
+            statsAway = selectedMatch.AwayTeamStatistics;
+
+            // set fifa code in 
+            cmbShowTeam.Items.Clear();
+            cmbShowTeam.Items.AddRange(new[] { statsHome.Country, statsAway.Country });
+            // set defualt to the first team
+            cmbShowTeam.SelectedIndex = 0;
+
+            //  check which team is the first, assume home
+            var stats = statsHome;
+            if (cmbShowTeam.SelectedItem == statsAway.Country)
+            {
+                stats = statsAway;
+            }
+
+            var fifaCode = cmbCountry.SelectedItem?.ToString().Split('-')[0].Trim();
+            System.Diagnostics.Debug.WriteLine($"fifaCode {fifaCode}");
+
+            if (selectedMatch.AwayTeam.Code == fifaCode)
+            {
+                statsHome = selectedMatch.AwayTeamStatistics;
+                statsAway = selectedMatch.HomeTeamStatistics;
+            }
+
+            if (statsHome == null)
+            {
+                MessageBox.Show("No statistics available.");
+                return;
+            }
+
+            List<Player> _allPlayers = new();
+
+            var homeTeam = JsonSerializer.Serialize(statsHome, new JsonSerializerOptions { WriteIndented = true });
+            var awayTeam = JsonSerializer.Serialize(statsAway, new JsonSerializerOptions { WriteIndented = true });
+
+            System.Diagnostics.Debug.WriteLine($"statsHome: {homeTeam}");
+            System.Diagnostics.Debug.WriteLine($"statsAway: {awayTeam}");
+
+
+            _allPlayersInMatch = stats.StartingEleven.Concat(stats.Substitutes).ToList();
+            _currentHomePlayers = statsHome.StartingEleven.ToList();
+            _currentAwayPlayers = statsAway.StartingEleven.ToList();
+
+            flpPlayers.Controls.Clear();
+            // Iterate through all players (starting eleven + substitutes)
+            foreach (var player in _allPlayersInMatch)
+            {
+                // do not add player to the main list since it is in the facourite list
+                bool isFavorite = _favoritePlayers.Any(p => p.Name == player.Name);
+                if (isFavorite) continue;
+
+                try
+                {
+                    // add player to the list of players
+                    var playerControl = new PlayerControl(player, isFavorite);
+                    playerControl.Margin = new Padding(5);
+                    flpPlayers.Controls.Add(playerControl);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ERROR {ex}");
+                    // continue to the next player
+                }
+            }
         }
 
+        private void cmbShowTeam_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"Coubtry {cmbShowTeam.SelectedItem}");
+
+            var stats = statsHome;
+            if (cmbShowTeam.SelectedItem == statsAway.Country)
+            {
+                stats = statsAway;
+            }
+
+            _allPlayersInMatch = stats.StartingEleven.Concat(stats.Substitutes).ToList();
+
+            flpPlayers.Controls.Clear();
+            // Iterate through all players (starting eleven + substitutes)
+            foreach (var player in _allPlayersInMatch)
+            {
+                // do not add player to the main list since it is in the facourite list
+                bool isFavorite = _favoritePlayers.Any(p => p.Name == player.Name);
+                if (isFavorite) continue;
+
+                try
+                {
+                    // add player to the list of players
+                    var playerControl = new PlayerControl(player, isFavorite);
+                    playerControl.Margin = new Padding(5);
+                    flpPlayers.Controls.Add(playerControl);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ERROR {ex}");
+                    // continue to the next player
+                }
+            }
+        }
 
         //FOR CLOSING
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
