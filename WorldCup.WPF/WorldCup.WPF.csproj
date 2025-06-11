@@ -12,4 +12,10 @@
     <ProjectReference Include="..\WorldCup.DataLayer\WorldCup.DataLayer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Resource Include="Assets\field.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
 </Project>

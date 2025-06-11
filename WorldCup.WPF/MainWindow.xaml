@@ -25,6 +25,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
@@ -47,25 +48,34 @@
             <ComboBox x:Name="cmbFavoriteTeam" Width="150"/>
         </StackPanel>
 
-        <GroupBox x:Name="grpFavoritePlayers" Header="Favorite Players" Grid.Row="1" Grid.Column="0" Margin="0,0,10,0">
-            <StackPanel>
-                <ListBox x:Name="lstFavoritePlayers" Height="120" Margin="0,0,0,10"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5">
-                    <Button x:Name="btnAddToFavorites" Content="Add Player" Width="100" Margin="0,0,90,0"/>
-                    <Button x:Name="btnRemoveFavoritePlayer" Content="Remove Player" Width="100"/>
-                </StackPanel>
+        <GroupBox x:Name="grpFavoritePlayers" Header="Favorite Players" Grid.Row="1" Grid.Column="0"  Margin="10,0,0,0">
+            <StackPanel Orientation="Vertical" >
+                <ListBox x:Name="lstFavoritePlayers" Height="120"  Margin="0,0,0,10">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem x:Name="miRemovePayer" Header="Remove from Favorites" Click="BtnRemoveFavoritePlayer_Click"/>
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
             </StackPanel>
         </GroupBox>
 
 
-        <GroupBox x:Name="grpFavoriteTeams" Header="Favorite Teams" Grid.Row="1" Grid.Column="1" Margin="10,0">
-            <StackPanel Orientation="Vertical">
-                <ListBox x:Name="lstFavouriteTeams" Height="120" Margin="0,0,0,10"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="0,0,0,5">
-                    <Button x:Name="btnAddFavoriteTeam" Content="Add Team" Width="80" Margin="10,0,30,0"/>
-                    <Button x:Name="btnRemoveFavoriteTeam" Content="Remove Team" Width="80"/>
+
+        <GroupBox x:Name="grpFavoriteTeams" Header="Favorite Teams" Grid.Row="1" Grid.Column="1" Margin="0,0,10,0">
+            <StackPanel>
+                <ListBox x:Name="lstFavouriteTeams" Height="120" Margin="0,0,0,10">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem x:Name="miRemoveTeam" Header="Remove from Favourites" Click="BtnRemoveFavoriteTeam_Click"/>
+                            <MenuItem x:Name="miTeamInfo" Header="Info" Click="BtnTeamInfo_Click"/>
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,0">
+                    <Button x:Name="btnAddFavoriteTeam" Content="Add Team" Width="140" Margin="0,0,0,0"/>
                 </StackPanel>
-                <Button x:Name="btnTeamInfo" Content="Team Info" Width="200" HorizontalAlignment="Center"/>
             </StackPanel>
         </GroupBox>
 
@@ -79,16 +89,61 @@
         
 
         <GroupBox x:Name="grpPlayers" Header="Players" Grid.Row="2" Grid.Column="0" Margin="0,10,10,0">
-            <ListBox x:Name="lstPlayers" Height="100"/>
+            <StackPanel Orientation="Vertical">
+                <ListBox x:Name="lstPlayers" Height="120" Margin="0,0,0,10">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem x:Name="miAddPlayer" Header="Add to Favorites" Click="BtnAddToFavoritesPlayer_Click"/>
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
+            </StackPanel>
         </GroupBox>
 
         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,0">
             <Button x:Name="btnLoadPlayers" Content="Load Players" Width="100" Height="90"/>
         </StackPanel>
 
-        <GroupBox x:Name="grpPlayerLayout" Header="Player Layout" Grid.Row="3" Grid.ColumnSpan="3" Margin="0,10,0,0">
-            <Canvas x:Name="canvasPlayers" Background="LightGreen" Height="500">
-            </Canvas>
+
+        <!--  INFO ABOUT TEAMS -->
+
+        <GroupBox x:Name="grpPlayerLayoutTitle" Header="Game info"
+         Grid.Row="3" Grid.ColumnSpan="3">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left" Margin="10,5,0,5">
+                    <Label x:Name="lblHomeTeam" Content="Home Team:"/>
+                    <Button x:Name="btnHomeStat" Content="Statistic" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right" Margin="0,5,10,5">
+                    <Button x:Name="btnAwayStat" Content="Statistic" />
+                    <Label x:Name="lblAwayTeam" Content="Away Team:"/>
+                </StackPanel>
+            </Grid>
         </GroupBox>
+
+        <!--  PLAYGROUND  -->
+
+        <GroupBox x:Name="grpPlayerLayout" Header="Player Layout"
+         Grid.Row="4" Grid.ColumnSpan="3"
+         Margin="0,10,0,0"
+         VerticalAlignment="Stretch"
+         HorizontalAlignment="Stretch">
+            <Grid>
+                <Canvas x:Name="canvasPlayers"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch">
+                    <Canvas.Background>
+                        <ImageBrush ImageSource="Assets/field.jpg" Stretch="Fill"/>
+                    </Canvas.Background>
+                </Canvas>
+            </Grid>
+        </GroupBox>
+        
     </Grid>
 </Window>

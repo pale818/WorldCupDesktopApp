@@ -6,6 +6,8 @@ using System.Windows.Markup;
 using WorldCup.Data.Models;
 using WorldCup.Data.Services;
 using System.IO;
+using System.Windows.Media.Animation;
+using System.Text.Json;
 namespace WorldCup.WPF
 {
     /// <summary>
@@ -21,6 +23,23 @@ namespace WorldCup.WPF
         private SettingsService _settingsService;
         private LocalizationService _localizationService;
 
+        // Context for menues
+        private ContextMenu _favoritePlayerRemoveContextMenu;
+        private ContextMenu _favoritePlayerAddContextMenu;
+        private ContextMenu _favoriteTeamRemoveContextMenu;
+        private ContextMenu _favoriteTeamInfoContextMenu;
+
+        private TeamStatistics statsHome;
+        private TeamStatistics statsAway;
+
+        private List<Player> _currentHomePlayers = new();
+        private List<Player> _currentAwayPlayers = new();
+
+        // Context menues
+        MenuItem teamInfo;
+        MenuItem removeTeam;
+        MenuItem addPlayer;
+        MenuItem removePlayer;
 
         private List<Team> _teams = new();
         private List<Match> _matches = new();
@@ -61,11 +80,46 @@ namespace WorldCup.WPF
             btnLoadMatches.Click += BtnLoadMatches_Click;
             btnLoadPlayers.Click += BtnLoadPlayers_Click;
             btnAddFavoriteTeam.Click += BtnAddFavoriteTeam_Click;
-            btnRemoveFavoriteTeam.Click += BtnRemoveFavoriteTeam_Click;
-            btnAddToFavorites.Click += BtnAddToFavoritesPlayer_Click;
-            btnRemoveFavoritePlayer.Click += BtnRemoveFavoritePlayer_Click;
+            //btnRemoveFavoriteTeam.Click += BtnRemoveFavoriteTeam_Click;
+            //btnAddToFavorites.Click += BtnAddToFavoritesPlayer_Click;
+            //btnRemoveFavoritePlayer.Click += BtnRemoveFavoritePlayer_Click;
+            //btnTeamInfo.Click += BtnTeamInfo_Click;
             cmbLanguage.SelectionChanged += CmbLanguage_SelectionChanged;
-            btnTeamInfo.Click += BtnTeamInfo_Click;
+
+            // Instantiate the ContextMenu
+            _favoritePlayerRemoveContextMenu = new ContextMenu();
+            _favoritePlayerAddContextMenu = new ContextMenu();
+            _favoriteTeamRemoveContextMenu = new ContextMenu();
+            _favoriteTeamInfoContextMenu = new ContextMenu();
+
+            teamInfo = new MenuItem();
+            removeTeam = new MenuItem();
+            addPlayer = new MenuItem();
+            removePlayer = new MenuItem();
+
+
+            // Menu item made via ContextMenu for removing favourite player
+            removePlayer.Header = "Remove from Favorites"; // Set the text displayed in the menu
+            removePlayer.Click += BtnRemoveFavoritePlayer_Click; // Attach the event handler for when the item is clicked
+            _favoritePlayerRemoveContextMenu.Items.Add(removePlayer);
+
+            // Menu item made via ContextMenu for adding favourite player
+            addPlayer.Header = "Add to Favorites"; // Set the text displayed in the menu
+            addPlayer.Click += BtnAddToFavoritesPlayer_Click; // Attach the event handler for when the item is clicked
+            _favoritePlayerAddContextMenu.Items.Add(addPlayer);
+
+            // Menu item made via ContextMenu for removing favourite team
+            removeTeam.Header = "Remove from Favourites"; // Set the text displayed in the menu
+            removeTeam.Click += BtnRemoveFavoriteTeam_Click; // Attach the event handler for when the item is clicked
+            _favoriteTeamRemoveContextMenu.Items.Add(removeTeam);
+
+            // Menu item made via ContextMenu for presenting team info
+            teamInfo.Header = "Info"; // Set the text displayed in the menu
+            teamInfo.Click += BtnTeamInfo_Click; // Attach the event handler for when the item is clicked
+            _favoriteTeamInfoContextMenu.Items.Add(teamInfo);
+
+
+
 
             this.Closing += MainWindow_Closing;
             this.Loaded += MainWindow_Loaded;
@@ -100,10 +154,16 @@ namespace WorldCup.WPF
             btnLoadMatches.Content = _localizationService["loadMatches"];
             btnLoadPlayers.Content = _localizationService["loadPlayers"];
             btnAddFavoriteTeam.Content = _localizationService["addFavoriteTeam"];
-            btnRemoveFavoriteTeam.Content = _localizationService["remove"];
-            btnRemoveFavoritePlayer.Content = _localizationService["removeFavoritePlayer"];
-            btnAddToFavorites.Content = _localizationService["addToFavorites"];
-            btnTeamInfo.Content = _localizationService["teamInfo"];
+
+            //btnRemoveFavoriteTeam.Content = _localizationService["remove"];
+            //btnRemoveFavoritePlayer.Content = _localizationService["removeFavoritePlayer"];
+            //btnAddToFavorites.Content = _localizationService["addToFavorites"];
+            //btnTeamInfo.Content = _localizationService["teamInfo"];
+
+            miTeamInfo.Header = _localizationService["teamInfo"];
+            miRemoveTeam.Header = _localizationService["remove"];
+            miAddPlayer.Header = _localizationService["addToFavorites"];
+            miRemovePayer.Header = _localizationService["removeFavoritePlayer"];
 
             // Use the correct x:Name prefixes from your XAML (grp instead of gb)
             grpFavoriteTeams.Header = _localizationService["favoriteTeamsHeader"];
@@ -183,50 +243,131 @@ namespace WorldCup.WPF
         //LOADS PLAYERS AFTER CHOOSING A SPECIFIC MATCH
         private void BtnLoadPlayers_Click(object sender, RoutedEventArgs e)
         {
+
             var selectedIndex = lstMatches.SelectedIndex;
             if (selectedIndex == -1) return;
 
             var selectedMatch = _matches[selectedIndex];
-            var stats = selectedMatch.HomeTeamStatistics;
-            if (stats == null)
+            statsHome = selectedMatch.HomeTeamStatistics;
+            statsAway = selectedMatch.AwayTeamStatistics;
+            var fifaCode = cmbFavoriteTeam.SelectedItem?.ToString().Split('-')[0].Trim();
+            System.Diagnostics.Debug.WriteLine($"fifaCode ${fifaCode}");
+
+            if (selectedMatch.AwayTeam.Code == fifaCode)
+            {
+                statsHome = selectedMatch.AwayTeamStatistics;
+                statsAway = selectedMatch.HomeTeamStatistics;
+            }
+
+            if (statsHome == null)
             {
                 MessageBox.Show("No statistics available.");
                 return;
             }
 
-            _allPlayersInMatch = stats.StartingEleven.Concat(stats.Substitutes).ToList();
+            List<Player> _allPlayers = new();
+
+            // for debuging
+            var homeTeam = JsonSerializer.Serialize(statsHome, new JsonSerializerOptions { WriteIndented = true });
+            var awayTeam = JsonSerializer.Serialize(statsAway, new JsonSerializerOptions { WriteIndented = true });
+            System.Diagnostics.Debug.WriteLine($"statsHome: {homeTeam}");
+            System.Diagnostics.Debug.WriteLine($"statsAway: {awayTeam}");
+
+            lblHomeTeam.Content = statsHome.Country;
+            lblAwayTeam.Content = statsAway.Country;
+
+            _allPlayersInMatch = statsHome.StartingEleven.Concat(statsHome.Substitutes).ToList();
+
+            // list of teams on the field
+            _currentHomePlayers = statsHome.StartingEleven.ToList();
+            _currentAwayPlayers = statsAway.StartingEleven.ToList();
 
             lstPlayers.Items.Clear();
+            // Iterate through all players (starting eleven + substitutes)
             foreach (var player in _allPlayersInMatch)
             {
-                lstPlayers.Items.Add(player.Name);
+                // Format the player information as a string
+                string playerInfo = $"{player.ShirtNumber} - {player.Name} ({player.Position})";
+                if (player.Captain)
+                {
+                    playerInfo += " 🧢"; // Add captain emoji if applicable
+                }
+                lstPlayers.Items.Add(playerInfo);
             }
 
+
             // Display on field
-            DisplayPlayersOnField(_allPlayersInMatch);
+            DisplayPlayersOnField();
         }
+
         //displays players on green field box
-        private void DisplayPlayersOnField(List<Player> players)
+        private void DisplayPlayersOnField()
+        {
+            RedrawPlayers();
+        }
+
+        private void RedrawPlayers()
         {
             canvasPlayers.Children.Clear();
 
-            // Dummy layout: 4 defenders, 4 midfielders, 2 attackers, 1 goalie
-            var layout = new List<Point>
-            {
-                new Point(220, 20),  // Goalie
-                new Point(50, 80), new Point(150, 80), new Point(250, 80), new Point(350, 80), // Defenders
-                new Point(50, 160), new Point(150, 160), new Point(250, 160), new Point(350, 160), // Midfield
-                new Point(150, 240), new Point(250, 240), // Attackers
-            };
+            double fieldWidth = canvasPlayers.ActualWidth;
+            double fieldHeight = canvasPlayers.ActualHeight;
 
-            for (int i = 0; i < players.Count && i < layout.Count; i++)
+            if (fieldWidth == 0 || fieldHeight == 0)
+                return;
+
+            List<Point> homeLayout = new()
+           {
+               new Point(0.0, 0.5), new Point(0.1, 0.2), new Point(0.1, 0.4),
+               new Point(0.1, 0.6), new Point(0.1, 0.8), new Point(0.2, 0.25),
+               new Point(0.2, 0.5), new Point(0.2, 0.75), new Point(0.30, 0.2),
+               new Point(0.30, 0.5), new Point(0.30, 0.8)
+           };
+
+            List<Point> awayLayout = new()
+           {
+               new Point(0.9, 0.5), new Point(0.8, 0.2), new Point(0.8, 0.4),
+               new Point(0.8, 0.6), new Point(0.8, 0.8), new Point(0.7, 0.25),
+               new Point(0.7, 0.5), new Point(0.7, 0.75), new Point(0.6, 0.2),
+               new Point(0.6, 0.5), new Point(0.6, 0.8)
+           };
+
+            void AddPlayers(List<Player> players, List<Point> layout)
             {
-                var playerControl = new PlayerControl(players[i].Name);
-                Canvas.SetLeft(playerControl, layout[i].X);
-                Canvas.SetTop(playerControl, layout[i].Y);
-                canvasPlayers.Children.Add(playerControl);
+                for (int i = 0; i < players.Count && i < layout.Count; i++)
+                {
+                    var player = players[i];
+                    string playerName = $"{player.Name}";
+                    string playerShirt = $"{player.ShirtNumber}";
+                    var control = new PlayerControl(playerName, playerShirt) { Opacity = 0 };
+
+                    double x = layout[i].X * fieldWidth;
+                    double y = layout[i].Y * fieldHeight;
+
+                    Canvas.SetLeft(control, x);
+                    Canvas.SetTop(control, y);
+                    canvasPlayers.Children.Add(control);
+
+                    var fadeIn = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(0.5),
+                        BeginTime = TimeSpan.FromSeconds(i * 0.2)
+                    };
+                    Storyboard.SetTarget(fadeIn, control);
+                    Storyboard.SetTargetProperty(fadeIn, new PropertyPath("Opacity"));
+
+                    var sb = new Storyboard();
+                    sb.Children.Add(fadeIn);
+                    sb.Begin();
+                }
             }
+
+            AddPlayers(_currentHomePlayers, homeLayout);
+            AddPlayers(_currentAwayPlayers, awayLayout);
         }
+
 
 
         //ADDS AND REMOVES FAVOURITE TEAM AND SAVES IT TO FILE

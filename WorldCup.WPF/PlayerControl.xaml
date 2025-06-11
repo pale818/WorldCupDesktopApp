@@ -5,14 +5,25 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WorldCup.WPF"
              mc:Ignorable="d" 
-             Width="60" Height="60">
-    
-    <Border Background="White" CornerRadius="30" BorderBrush="Black" BorderThickness="1">
-        <TextBlock x:Name="txtPlayerName"
-                   Text="Name"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   FontSize="10"
-                   TextWrapping="Wrap" />
-    </Border>
+             Width="120" Height="55">
+    <StackPanel Background="Transparent" Orientation="Vertical" >
+        <Border Background="White" Width="40" Height="40" CornerRadius="40" BorderBrush="Black" BorderThickness="1">
+            <TextBlock x:Name="txtPlayerShirt"
+               Text="Shirt"
+               Foreground="Red"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               FontSize="10"/>
+        </Border>
+        <Grid Background="Transparent" HorizontalAlignment="Center">
+            <TextBlock x:Name="txtPlayerName"
+               Text="Name"
+               HorizontalAlignment="Center"
+               TextAlignment ="Center"
+               Foreground="Red"
+               FontSize="10"
+               Width="120" />
+        </Grid>
+
+    </StackPanel>
 </UserControl>
