@@ -2,12 +2,12 @@
   "title": "Svjetsko Prvenstvo Aplikacija",
   "gender": "Spol",
   "language": "Jezik",
-  "favoriteTeam": "Omiljeni Tim",
+  "choosenTeam": "Izabrani Tim",
   "favoritePlayer": "Omiljeni Igrač",
   "loadMatches": "Učitaj Utakmice",
   "loadPlayers": "Učitaj Igrače",
   "addToFavorites": "Dodaj u Favorite",
-  "remove": "Ukloni",
+  "remove": "Ukloni tim",
   "country": "Država",
   "listOfMatches": "Popis Utakmica",
   "listOfPlayers": "Popis Igrača",
@@ -24,8 +24,18 @@
   "cancel": "Poništi",
   "save": "Spremi",
   "settings": "Postavke",
-  "stat" :  "Statistika",
-  "groupInfo": "Tabica za statistiku"
-
-
+  "stat": "Statistika",
+  "groupInfo": "Tabica za statistiku",
+  "dataLoadingError": "Provjerite internet vezu podaci se ne mogu učitati",
+  "playerDoesNotBelong": "Igrač ne pripada toj momčadi.",
+  "playerRemovedFromFavouite": "izbrisan sa liste omiljenih.",
+  "teamAlredyInFavList": "Tim je već dodan u omiljenu listu.",
+  "selectTeamToRemove": "Izaberi tim kojeg želiš ukloniti.",
+  "noStatistic": "Nema statistike.",
+  "exitQuestion": "Sigurno želite prekinuti program?.",
+  "selGenderAndLang": "Molim vas odaberite spol i jezik.",
+  "playerAlreadyInFavList": "Igrač je već u listi omiljenih.",
+  "addedPlayerToFavList": "dodan u listu omiljenih",
+  "selPlayerToRemove": "Molim vas izaberite igrača za maknuti s liste",
+  "noTeamSelected": "Tim nije selektiran"
 }

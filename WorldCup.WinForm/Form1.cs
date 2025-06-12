@@ -38,6 +38,22 @@ namespace WorldCup.WinForm
             InitializeComponent();
             _localizationService = new LocalizationService();
 
+            //_confServ works with public "Settings" variable from CongifServ class
+            _configService = new ConfigService();
+            _settingsService = new SettingsService();
+
+
+            //LoadLang creates a dictionary based on lang
+            _localizationService.LoadLanguage(_configService.Settings.Language);
+
+
+            // REMOVES FROM FAV LIST PLAYERS BY CONTEXT MENU
+            _favoritePlayerContextMenu = new ContextMenuStrip();
+            _favoritePlayerContextMenu.Items.Add(_localizationService["removeFavoritePlayer"], null, RemoveFromFavorites_Click);
+
+            ApplyLocalization();
+
+
             flpPlayers.DragEnter += Panel_DragEnter;
             flpFavPlayers.DragEnter += Panel_DragEnter;
 
@@ -47,10 +63,6 @@ namespace WorldCup.WinForm
 
             this.DragEnter += MainForm_DragEnter;
             this.DragDrop += MainForm_DragDrop;
-
-            // REMOVES FROM FAV LIST PLAYERS BY CONTEXT MENU
-            _favoritePlayerContextMenu = new ContextMenuStrip();
-            _favoritePlayerContextMenu.Items.Add("Remove from Favorites", null, RemoveFromFavorites_Click);
         }
 
 
@@ -59,19 +71,10 @@ namespace WorldCup.WinForm
         {
 
             //OBJECTS OF DIFF SERVICES
-
-            //_confServ works with public "Settings" variable from CongifServ class
-            _configService = new ConfigService();
-            _settingsService = new SettingsService();
-
-
             //use the values from "Settings" to change gender
             _teamService = new TeamService(_configService);
             _matchService = new MatchService(_configService);
 
-            //LoadLang creates a dictionary based on lang
-            _localizationService.LoadLanguage(_configService.Settings.Language);
-            ApplyLocalization();
 
 
             //loading teams in combo box Country
@@ -174,7 +177,7 @@ namespace WorldCup.WinForm
                 bool existsInMatch = _allPlayersInMatch.Any(p => p.Name == player.Name);
                 if (!existsInMatch)
                 {
-                    MessageBox.Show("This player doesn't belong to the current match.");
+                    MessageBox.Show(_localizationService["playerDoesNotBelong"]);
                     return;
                 }
 
@@ -220,7 +223,7 @@ namespace WorldCup.WinForm
                     _favoritePlayers.RemoveAll(p => p.Name == player.Name);
                     _settingsService.SaveFavoritePlayers(_favoritePlayers);
 
-                    MessageBox.Show($"{player.Name} removed from favorites.");
+                    MessageBox.Show($"{player.Name} {_localizationService["playerRemovedFromFavouite"]}");
                     loadPlayers();
                 }
             }
@@ -248,6 +251,10 @@ namespace WorldCup.WinForm
             btnSettings.Text = _localizationService["settings"];
 
 
+            // Context menu for remove fav player update 
+            _favoritePlayerContextMenu.Items.Clear(); //  = new ContextMenuStrip();
+            _favoritePlayerContextMenu.Items.Add(_localizationService["removeFavoritePlayer"], null, RemoveFromFavorites_Click);
+
 
             this.Invalidate();
             this.Refresh();
@@ -267,7 +274,7 @@ namespace WorldCup.WinForm
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message); // user-friendly error shown in UI
+                MessageBox.Show(_localizationService["dataLoadingError"]);
                 return;
             }
 
@@ -275,6 +282,7 @@ namespace WorldCup.WinForm
             foreach (var team in _teams)
             {
                 cmbCountry.Items.Add($"{team.FifaCode} - {team.Country}");
+
             }
         }
 
@@ -299,7 +307,7 @@ namespace WorldCup.WinForm
                     _favoritePlayers.RemoveAll(p => p.Name == player.Name);
                     _settingsService.SaveFavoritePlayers(_favoritePlayers);
 
-                    MessageBox.Show($"{player.Name} removed from favorites via context menu.");
+                    MessageBox.Show($"{player.Name} {_localizationService["playerRemovedFromFavouite"]}");
                     loadPlayers(); // Refresh the main players panel
                 }
             }
@@ -340,7 +348,7 @@ namespace WorldCup.WinForm
             }
             else
             {
-                MessageBox.Show("This team is already in the favorite list.");
+                MessageBox.Show($"{_localizationService["teamAlredyInFavList"]}");
             }
         }
 
@@ -356,7 +364,7 @@ namespace WorldCup.WinForm
             //-1 is if the list is empty
             if (selectedIndex == -1)
             {
-                MessageBox.Show("Select a team to remove.");
+                MessageBox.Show($"{_localizationService["selectTeamToRemove"]}");
                 return;
             }
 
@@ -426,48 +434,6 @@ namespace WorldCup.WinForm
 
         private void loadPlayers()
         {
-            /*
-            var selectedIndex = lstMatches.SelectedIndex;
-            if (selectedIndex == -1) return;
-
-            var selectedMatch = _matches[selectedIndex];
-
-            TeamStatistics stats = null;
-
-            // detect does selected team belongs to HomeTeam or AwayTeam
-            stats = selectedMatch.HomeTeamStatistics;
-            var fifaCode = cmbCountry.SelectedItem?.ToString().Split('-')[0].Trim();
-            System.Diagnostics.Debug.WriteLine($"fifaCode ${fifaCode}");
-
-            if (selectedMatch.AwayTeam.Code == fifaCode)
-            {
-                stats = selectedMatch.AwayTeamStatistics;
-            }
-
-
-            if (stats == null)
-            {
-                MessageBox.Show("No statistics available for this match/side.");
-                return;
-            }
-
-            // Store full list for later comparisons
-            _allPlayersInMatch = stats.StartingEleven.Concat(stats.Substitutes).ToList();
-
-            // DO NOT clear panelFavoritePlayers — it contains your favorites already
-            flpPlayers.Controls.Clear();
-
-            foreach (var player in _allPlayersInMatch)
-            {
-                // do not add player to the main list since it is in the facourite list
-                bool isFavorite = _favoritePlayers.Any(p => p.Name == player.Name);
-                if (isFavorite) continue;
-
-                var playerControl = new PlayerControl(player, isFavorite);
-                playerControl.Margin = new Padding(5);
-                flpPlayers.Controls.Add(playerControl);
-            }
-            */
 
             var selectedIndex = lstMatches.SelectedIndex;
             if (selectedIndex == -1) return;
@@ -500,7 +466,7 @@ namespace WorldCup.WinForm
 
             if (statsHome == null)
             {
-                MessageBox.Show("No statistics available.");
+                MessageBox.Show($"{_localizationService["noStatistic"]}");
                 return;
             }
 
@@ -578,8 +544,8 @@ namespace WorldCup.WinForm
         //FOR CLOSING
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to exit?", "Exit Confirmation",
-    MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+            var result = MessageBox.Show(_localizationService["exitQuestion"], "OK",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
 
             if (result == DialogResult.No)
             {

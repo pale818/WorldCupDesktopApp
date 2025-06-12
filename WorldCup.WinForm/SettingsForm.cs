@@ -80,7 +80,7 @@ namespace WorldCup.WinForm
 
             if (string.IsNullOrEmpty(gender) || string.IsNullOrEmpty(language))
             {
-                MessageBox.Show("Please select both gender and language.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(_localizationService["selGenderAndLang"], "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

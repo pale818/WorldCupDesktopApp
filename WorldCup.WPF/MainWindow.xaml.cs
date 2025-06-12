@@ -137,7 +137,7 @@ namespace WorldCup.WPF
         }
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to exit?", "Exit Confirmation",
+            var result = MessageBox.Show(_localizationService["exitQuestion"], "OK",
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.No)
@@ -151,7 +151,7 @@ namespace WorldCup.WPF
         {
             if (statsHome == null)
             {
-                MessageBox.Show("No info.");
+                MessageBox.Show(_localizationService["noStatistic"]);
                 return;
             }
 
@@ -162,7 +162,7 @@ namespace WorldCup.WPF
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(_localizationService["dataLoadingError"]);
                 return;
             }
         }
@@ -171,7 +171,7 @@ namespace WorldCup.WPF
         {
             if (statsAway == null)
             {
-                MessageBox.Show("No info.");
+                MessageBox.Show(_localizationService["noStatistic"]);
                 return;
             }
 
@@ -182,7 +182,7 @@ namespace WorldCup.WPF
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(_localizationService["dataLoadingError"]);
                 return;
             }
         }
@@ -194,7 +194,7 @@ namespace WorldCup.WPF
             this.Title = _localizationService["title"];
             lblGender.Content = _localizationService["gender"];
             lblLanguage.Content = _localizationService["language"];
-            lblFavoriteTeam.Content = _localizationService["favoriteTeam"];
+            lblChoosenTeam.Content = _localizationService["choosenTeam"];
 
             btnLoadMatches.Content = _localizationService["loadMatches"];
             btnLoadPlayers.Content = _localizationService["loadPlayers"];
@@ -240,18 +240,18 @@ namespace WorldCup.WPF
 
                 System.Diagnostics.Debug.WriteLine(_teams);
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(_localizationService["dataLoadingError"]);
             }
 
-            cmbFavoriteTeam.Items.Clear();
+            cmbChoosenTeam.Items.Clear();
             foreach (var team in _teams)
             {
-                cmbFavoriteTeam.Items.Add($"{team.FifaCode} - {team.Country}");
+                cmbChoosenTeam.Items.Add($"{team.FifaCode} - {team.Country}");
             }
 
             //  Ensure something is selected by default
-            if (cmbFavoriteTeam.Items.Count > 0 && cmbFavoriteTeam.SelectedIndex == -1)
-                cmbFavoriteTeam.SelectedIndex = 0;
+            if (cmbChoosenTeam.Items.Count > 0 && cmbChoosenTeam.SelectedIndex == -1)
+                cmbChoosenTeam.SelectedIndex = 0;
         }
 
 
@@ -260,7 +260,7 @@ namespace WorldCup.WPF
         private async void BtnLoadMatches_Click(object sender, RoutedEventArgs e)
         {
             var gender = cmbGender.SelectedItem?.ToString() ?? "men";
-            var selectedTeam = cmbFavoriteTeam.SelectedItem?.ToString();
+            var selectedTeam = cmbChoosenTeam.SelectedItem?.ToString();
             if (string.IsNullOrEmpty(selectedTeam)) return;
 
             var fifaCode = selectedTeam.Split('-')[0].Trim();
@@ -292,7 +292,7 @@ namespace WorldCup.WPF
             var selectedMatch = _matches[selectedIndex];
             statsHome = selectedMatch.HomeTeamStatistics;
             statsAway = selectedMatch.AwayTeamStatistics;
-            var fifaCode = cmbFavoriteTeam.SelectedItem?.ToString().Split('-')[0].Trim();
+            var fifaCode = cmbChoosenTeam.SelectedItem?.ToString().Split('-')[0].Trim();
             System.Diagnostics.Debug.WriteLine($"fifaCode ${fifaCode}");
 
             if (selectedMatch.AwayTeam.Code == fifaCode)
@@ -303,7 +303,7 @@ namespace WorldCup.WPF
 
             if (statsHome == null)
             {
-                MessageBox.Show("No statistics available.");
+                MessageBox.Show(_localizationService["noStatistic"]);
                 return;
             }
 
@@ -414,7 +414,7 @@ namespace WorldCup.WPF
         //ADDS AND REMOVES FAVOURITE TEAM AND SAVES IT TO FILE
         private void BtnAddFavoriteTeam_Click(object sender, RoutedEventArgs e)
         {
-            var selectedTeam = cmbFavoriteTeam.SelectedItem?.ToString();
+            var selectedTeam = cmbChoosenTeam.SelectedItem?.ToString();
             if (string.IsNullOrEmpty(selectedTeam)) return;
 
             if (!lstFavouriteTeams.Items.Contains(selectedTeam))
@@ -425,7 +425,7 @@ namespace WorldCup.WPF
             }
             else
             {
-                MessageBox.Show("This team is already in the favorite list.");
+                MessageBox.Show(_localizationService["teamAlredyInFavList"]);
             }
         }
 
@@ -434,7 +434,7 @@ namespace WorldCup.WPF
             var selectedIndex = lstFavouriteTeams.SelectedIndex;
             if (selectedIndex == -1)
             {
-                MessageBox.Show("Please select a team to remove.");
+                MessageBox.Show(_localizationService["selectTeamToRemove"]);
                 return;
             }
 
@@ -477,7 +477,7 @@ namespace WorldCup.WPF
 
             if (player == null || _favoritePlayers.Any(p => p.Name == player.Name))
             {
-                MessageBox.Show("This player is already in the favorite list.");
+                MessageBox.Show(_localizationService["playerAlreadyInFavList"]);
                 return;
 
             }
@@ -485,7 +485,7 @@ namespace WorldCup.WPF
             _favoritePlayers.Add(player);
             _settingsService.SaveFavoritePlayers(_favoritePlayers);
             LoadFavoritePlayers();
-            MessageBox.Show($"Added {player.Name} to favorites.");
+            MessageBox.Show($"{player.Name} {_localizationService["addedPlayerToFavList"]}");
         }
 
         private void BtnRemoveFavoritePlayer_Click(object sender, RoutedEventArgs e)
@@ -493,7 +493,7 @@ namespace WorldCup.WPF
             var selectedIndex = lstFavoritePlayers.SelectedIndex;
             if (selectedIndex == -1)
             {
-                MessageBox.Show("Please select a player to remove.");
+                MessageBox.Show(_localizationService["selPlayerToRemove"]);
                 return;
             }
 
@@ -537,28 +537,35 @@ namespace WorldCup.WPF
         //DISPLAYS TEAM STATISTICS IN A POP UP WINDOW
         private async void BtnTeamInfo_Click(object sender, RoutedEventArgs e)
         {
-            var selectedIndex = cmbFavoriteTeam.SelectedIndex;
+            var selectedIndex = cmbChoosenTeam.SelectedIndex;
             if (selectedIndex == -1)
             {
-                MessageBox.Show("No team selected.");
+                MessageBox.Show(_localizationService["noTeamSelected"]);
                 return;
             }
 
-            var selected = cmbFavoriteTeam.Items[selectedIndex].ToString();
-            var fifaCode = selected.Split('-')[0].Trim();
-
-            var team = _teams.FirstOrDefault(t => t.FifaCode == fifaCode);
-            var results = await _teamService.GetTeamResultsAsync(cmbGender.SelectedItem?.ToString() ?? "men");
-            var stats = results.FirstOrDefault(r => r.FifaCode == fifaCode);
-
-            if (team != null && stats != null)
+            try
             {
-                var infoWindow = new TeamInfo(team.Country, fifaCode, stats);
-                infoWindow.ShowDialog();
+                var selected = cmbChoosenTeam.Items[selectedIndex].ToString();
+                var fifaCode = selected.Split('-')[0].Trim();
+
+                var team = _teams.FirstOrDefault(t => t.FifaCode == fifaCode);
+                var results = await _teamService.GetTeamResultsAsync(cmbGender.SelectedItem?.ToString() ?? "men");
+                var stats = results.FirstOrDefault(r => r.FifaCode == fifaCode);
+
+                if (team != null && stats != null)
+                {
+                    var infoWindow = new TeamInfo(team.Country, fifaCode, stats);
+                    infoWindow.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show(_localizationService["dataLoadingError"]);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Could not load team info.");
+                MessageBox.Show(_localizationService["dataLoadingError"]);
             }
         }
 
