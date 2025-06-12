@@ -116,13 +116,15 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left" Margin="10,5,0,5">
-                    <Label x:Name="lblHomeTeam" Content="Home Team:"/>
+                    <Label x:Name="lblHomeTeam" Content="" Foreground="Red" />
                     <Button x:Name="btnHomeStat" Content="Statistic" />
+                    <Label x:Name="lblScoreHomeTeam" Content="" FontSize="30" Padding="100,0,0,0"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right" Margin="0,5,10,5">
+                    <Label x:Name="lblScoreAwayTeam" Content="" FontSize="30" Padding="0,0,100,0"/>
                     <Button x:Name="btnAwayStat" Content="Statistic" />
-                    <Label x:Name="lblAwayTeam" Content="Away Team:"/>
+                    <Label x:Name="lblAwayTeam" Content="" Foreground="Red" />
                 </StackPanel>
             </Grid>
         </GroupBox>

@@ -37,6 +37,6 @@
   "playerAlreadyInFavList": "This player is already in the favorite list.",
   "addedPlayerToFavList": "added in favourite list",
   "selPlayerToRemove": "Please select a player to remove.",
-  "noTeamSelected": "No team selected"
-
+  "noTeamSelected": "No team selected",
+  "lblData": "Data"
 }

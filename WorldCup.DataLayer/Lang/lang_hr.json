@@ -37,5 +37,6 @@
   "playerAlreadyInFavList": "Igrač je već u listi omiljenih.",
   "addedPlayerToFavList": "dodan u listu omiljenih",
   "selPlayerToRemove": "Molim vas izaberite igrača za maknuti s liste",
-  "noTeamSelected": "Tim nije selektiran"
+  "noTeamSelected": "Tim nije selektiran",
+  "lblData": "Podaci"
 }

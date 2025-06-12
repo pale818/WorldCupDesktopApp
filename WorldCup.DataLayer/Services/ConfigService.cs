@@ -25,6 +25,15 @@ public class ConfigService
         }
     }
 
+    // Loads data from the file into Settings variable
+    public void LoadConfig()
+    {
+        if (File.Exists(ConfigPath))
+        {
+            var json = File.ReadAllText(ConfigPath);
+            Settings = JsonSerializer.Deserialize<ConfigSettings>(json) ?? new ConfigSettings();
+        }
+    }
 
     //saves the current values in settings obj to json form
     public void Save()

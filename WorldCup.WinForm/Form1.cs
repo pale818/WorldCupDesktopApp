@@ -26,7 +26,6 @@ namespace WorldCup.WinForm
 
         // config services
         private ConfigService _configService;
-        private AppConfig _appConfig;
 
         private TeamStatistics statsHome;
         private TeamStatistics statsAway;
@@ -264,7 +263,7 @@ namespace WorldCup.WinForm
         //based on choosen gender "Country" combo box is filled with teams 
         private async Task LoadTeams()
         {
-            _configService = new ConfigService();
+            _configService.LoadConfig();
             var gender = _configService.Settings.Gender;
 
             try
@@ -381,7 +380,7 @@ namespace WorldCup.WinForm
         private async void btnMatches_Click(object sender, EventArgs e)
         {
             // fetch from cmbGender value, converts into string and in case nothing is found takes "man"
-            _configService = new ConfigService();
+            _configService.LoadConfig();
             var gender = _configService.Settings.Gender;
 
 
@@ -562,7 +561,7 @@ namespace WorldCup.WinForm
                     System.Diagnostics.Debug.WriteLine("REFRESH UI");
 
 
-                    _configService = new ConfigService();
+                    _configService.LoadConfig();
                     _localizationService = new LocalizationService();
                     _localizationService.LoadLanguage(_configService.Settings.Language);
                     ApplyLocalization();

@@ -34,6 +34,8 @@
             btnCancel = new Button();
             btnSave = new Button();
             lblGender = new Label();
+            cmbData = new ComboBox();
+            lblData = new Label();
             SuspendLayout();
             // 
             // cmbGender
@@ -94,11 +96,31 @@
             lblGender.Text = "Gender";
             lblGender.Click += lblGender_Click;
             // 
+            // cmbData
+            // 
+            cmbData.FormattingEnabled = true;
+            cmbData.Location = new Point(51, 104);
+            cmbData.Name = "cmbData";
+            cmbData.Size = new Size(152, 28);
+            cmbData.TabIndex = 7;
+            cmbData.SelectedIndexChanged += cmbData_SelectedIndexChanged;
+            // 
+            // lblData
+            // 
+            lblData.AutoSize = true;
+            lblData.Location = new Point(52, 145);
+            lblData.Name = "lblData";
+            lblData.Size = new Size(41, 20);
+            lblData.TabIndex = 8;
+            lblData.Text = "Data";
+            // 
             // SettingsForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(510, 247);
+            Controls.Add(lblData);
+            Controls.Add(cmbData);
             Controls.Add(lblGender);
             Controls.Add(btnSave);
             Controls.Add(btnCancel);
@@ -120,5 +142,7 @@
         private Button btnCancel;
         private Button btnSave;
         private Label lblGender;
+        private ComboBox cmbData;
+        private Label lblData;
     }
 }

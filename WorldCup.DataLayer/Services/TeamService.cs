@@ -42,11 +42,14 @@ public class TeamService
     //Console.WriteLine($"GetTeamsAsync: JsonSerializer {JsonSerializer.Deserialize<List<Team>>(response, _jsonOptions)}");
     public async Task<List<Team>> GetTeamsAsync(string gender = "men")
     {
+        System.Diagnostics.Debug.WriteLine($"DataSource {_config.Settings.DataSource}");
+
         try
         {
+
             if (_config.Settings.DataSource == "local")
             {
-                var file = $"./Data/{gender}_teams.json";
+                var file = $"./Data/{gender}/teams.json";
                 System.Diagnostics.Debug.WriteLine($"[GetTeamsAsync] Local file: {file}");
 
                 if (File.Exists(file))
@@ -87,8 +90,23 @@ public class TeamService
 
     public async Task<List<TeamResult>> GetTeamResultsAsync(string gender = "men")
     {
+        System.Diagnostics.Debug.WriteLine($"DataSource {_config.Settings.DataSource}");
+
         try
         {
+            if (_config.Settings.DataSource == "local")
+            {
+                var file = $"./Data/{gender}/results.json";
+                if (File.Exists(file))
+                {
+                    var json = await File.ReadAllTextAsync(file);
+                    return JsonSerializer.Deserialize<List<TeamResult>>(json, _jsonOptions) ?? new();
+                }
+
+                return new(); // empty list fallback
+            }
+
+
             var url = $"{BaseUrl(gender)}/teams/results";
             var response = await _httpClient.GetStringAsync(url);
             return JsonSerializer.Deserialize<List<TeamResult>>(response, _jsonOptions) ?? new();
@@ -114,8 +132,21 @@ public class TeamService
     public async Task<List<GroupResult>> GetGroupResultsAsync(string gender = "men")
     {
 
+        System.Diagnostics.Debug.WriteLine($"DataSource {_config.Settings.DataSource}");
+
         try
         {
+            if (_config.Settings.DataSource == "local")
+            {
+                var file = $"./Data/{gender}/group_results.json";
+                if (File.Exists(file))
+                {
+                    var json = await File.ReadAllTextAsync(file);
+                    return JsonSerializer.Deserialize<List<GroupResult>>(json, _jsonOptions) ?? new();
+                }
+            }
+
+
             var url = $"{BaseUrl(gender)}/teams/group_results";
             //System.Diagnostics.Debug.WriteLine($"url {url}");
             var response = await _httpClient.GetStringAsync(url);

@@ -28,9 +28,13 @@ namespace WorldCup.WinForm
         {
             cmbGender.Items.AddRange(new string[] { "men", "women" });
             cmbLanguage.Items.AddRange(new string[] { "hr", "en" });
+            cmbData.Items.AddRange(new string[] { "api", "local" });
+
 
             cmbGender.SelectedItem = _configService.Settings.Gender;
             cmbLanguage.SelectedItem = _configService.Settings.Language;
+            cmbData.SelectedItem = _configService.Settings.DataSource;
+
         }
 
 
@@ -61,7 +65,7 @@ namespace WorldCup.WinForm
                 lblLanguage.Text = _localizationService["language"];
                 btnCancel.Text = _localizationService["cancel"];
                 btnSave.Text = _localizationService["save"];
-
+                lblData.Text = _localizationService["lblData"];
             }
         }
 
@@ -77,6 +81,8 @@ namespace WorldCup.WinForm
         {
             var gender = cmbGender.SelectedItem?.ToString();
             var language = cmbLanguage.SelectedItem?.ToString();
+            var dataSource = cmbData.SelectedItem?.ToString();
+
 
             if (string.IsNullOrEmpty(gender) || string.IsNullOrEmpty(language))
             {
@@ -86,6 +92,8 @@ namespace WorldCup.WinForm
 
             _configService.Settings.Gender = gender;
             _configService.Settings.Language = language;
+            _configService.Settings.DataSource = dataSource;
+
             _configService.Save();
 
 
@@ -99,6 +107,12 @@ namespace WorldCup.WinForm
             Close();
         }
 
+        private void cmbData_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _configService.Settings.DataSource = cmbData.SelectedItem.ToString() ?? "api";
+            _configService.Save();
+        }
+
         private void SettingsForm_Load(object sender, EventArgs e)
         {
 
@@ -108,6 +122,7 @@ namespace WorldCup.WinForm
         {
 
         }
+
 
     }
 }

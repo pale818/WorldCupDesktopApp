@@ -1,6 +1,7 @@
 ﻿{
-    "data_source": "api", // or "local"
-    "gender": "men",
-    "language": "en",
-    "favorite_team": "CRO"
+  "data_source": "api", // or "local"
+  "gender": "men",
+  "language": "en",
+  "favorite_team": "CRO",
+  "resolution": "1024x768"
 }

@@ -222,6 +222,7 @@ namespace WorldCup.WPF
             var selectedGender = cmbGender.SelectedItem?.ToString();
             if (!string.IsNullOrEmpty(selectedGender))
             {
+                _configService.LoadConfig();
                 _configService.Settings.Gender = selectedGender;
                 _configService.Save();
                 lstPlayers.Items.Clear();
@@ -317,6 +318,10 @@ namespace WorldCup.WPF
 
             lblHomeTeam.Content = statsHome.Country;
             lblAwayTeam.Content = statsAway.Country;
+
+
+            lblScoreHomeTeam.Content = selectedMatch.HomeTeam.Goals;
+            lblScoreAwayTeam.Content = selectedMatch.AwayTeam.Goals;
 
             _allPlayersInMatch = statsHome.StartingEleven.Concat(statsHome.Substitutes).ToList();
 
@@ -525,6 +530,7 @@ namespace WorldCup.WPF
             var selectedLanguage = cmbLanguage.SelectedItem?.ToString();
             if (!string.IsNullOrEmpty(selectedLanguage))
             {
+                _configService.LoadConfig();
                 _configService.Settings.Language = selectedLanguage;
                 _configService.Save();
                 _localizationService.LoadLanguage(selectedLanguage);
