@@ -89,26 +89,16 @@ public class TeamService
     {
         try
         {
-            if (_config.Settings.DataSource == "local")
-            {
-                var file = $"./Data/{gender}_team_results.json";
-                if (File.Exists(file))
-                {
-                    var json = await File.ReadAllTextAsync(file);
-                    return JsonSerializer.Deserialize<List<TeamResult>>(json, _jsonOptions) ?? new();
-                }
-            }
-
             var url = $"{BaseUrl(gender)}/teams/results";
             var response = await _httpClient.GetStringAsync(url);
             return JsonSerializer.Deserialize<List<TeamResult>>(response, _jsonOptions) ?? new();
 
-    }
+        }
         catch (HttpRequestException httpEx)
         {
             System.Diagnostics.Debug.WriteLine("HTTP request error: " + httpEx.Message);
             throw new Exception("Failed to retrieve teams. Network issue or server is unreachable.");
-}
+        }
         catch (JsonException jsonEx)
         {
             System.Diagnostics.Debug.WriteLine("Deserialization error: " + jsonEx.Message);
@@ -123,22 +113,30 @@ public class TeamService
 
     public async Task<List<GroupResult>> GetGroupResultsAsync(string gender = "men")
     {
-        if (_config.Settings.DataSource == "local")
+
+        try
         {
-            var file = $"./Data/{gender}_group_results.json";
-            if (File.Exists(file))
-            {
-                var json = await File.ReadAllTextAsync(file);
-                return JsonSerializer.Deserialize<List<GroupResult>>(json, _jsonOptions) ?? new();
-            }
+            var url = $"{BaseUrl(gender)}/teams/group_results";
+            //System.Diagnostics.Debug.WriteLine($"url {url}");
+            var response = await _httpClient.GetStringAsync(url);
+            // System.Diagnostics.Debug.WriteLine($"response {response}");
+            return JsonSerializer.Deserialize<List<GroupResult>>(response, _jsonOptions) ?? new();
+
         }
-
-        var url = $"{BaseUrl(gender)}/teams/group_results";
-        //System.Diagnostics.Debug.WriteLine($"url {url}");
-
-        var response = await _httpClient.GetStringAsync(url);
-        // System.Diagnostics.Debug.WriteLine($"response {response}");
-
-        return JsonSerializer.Deserialize<List<GroupResult>>(response, _jsonOptions) ?? new();
+        catch (HttpRequestException httpEx)
+        {
+            System.Diagnostics.Debug.WriteLine("HTTP request error: " + httpEx.Message);
+            throw new Exception("Failed to retrieve teams. Network issue or server is unreachable.");
+        }
+        catch (JsonException jsonEx)
+        {
+            System.Diagnostics.Debug.WriteLine("Deserialization error: " + jsonEx.Message);
+            throw new Exception("Failed to parse team data. Server response format may be incorrect.");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("Unexpected error: " + ex.Message);
+            throw new Exception("An unexpected error occurred while loading teams.");
+        }
     }
 }

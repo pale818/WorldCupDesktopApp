@@ -46,29 +46,6 @@ public class MatchService
     // return is a List of Match, input parameter is gender and default is "man"
     public async Task<List<Match>> GetAllMatchesAsync(string gender = "men")
     {
-        // we can disable loading from local (SSD / disk)
-        /*
-        if (_config.Settings.DataSource == "local")
-        {
-            var path = $"./Data/{gender}_matches.json";
-            System.Diagnostics.Debug.WriteLine("Path: " + path);
-
-            if (File.Exists(path))
-            {
-                try
-                {
-                    var json = await File.ReadAllTextAsync(path);
-                    return JsonSerializer.Deserialize<List<Match>>(json, _jsonOptions) ?? new();
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine("Deserialization error (local): " + ex.Message);
-                    return new(); // fallback to empty list
-                }
-            }
-            return new(); // fallback if file not found
-        }
-        */
 
         var url = $"{BaseUrl(gender)}/matches";
         

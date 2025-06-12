@@ -30,8 +30,7 @@ namespace WorldCup.WinForm
 
         private TeamStatistics statsHome;
         private TeamStatistics statsAway;
-        private List<Player> _currentHomePlayers = new();
-        private List<Player> _currentAwayPlayers = new();
+       
 
         public Form1()
         {
@@ -480,8 +479,7 @@ namespace WorldCup.WinForm
 
 
             _allPlayersInMatch = stats.StartingEleven.Concat(stats.Substitutes).ToList();
-            _currentHomePlayers = statsHome.StartingEleven.ToList();
-            _currentAwayPlayers = statsAway.StartingEleven.ToList();
+          
 
             flpPlayers.Controls.Clear();
             // Iterate through all players (starting eleven + substitutes)

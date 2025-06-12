@@ -33,24 +33,7 @@ public class SettingsService
         File.WriteAllText(FavoritePlayersPath, json);
     }
 
-    // Load favorite team FIFA code
-    /*public string LoadFavoriteTeam()
-    {
-        return File.Exists(FavoriteTeamPath)
-            ? File.ReadAllText(FavoriteTeamPath)
-            : ""; // default fallback
-    }*/
-
-
-    // Save favorite team FIFA code
-   /* public void SaveFavoriteTeam(string fifaCode)
-    {
-        File.WriteAllText(FavoriteTeamPath, fifaCode);
-    }
-   */
-
-
-
+    
     public AppConfig LoadAppConfig()
     {
         if (!File.Exists(ConfigPath))
