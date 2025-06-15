@@ -113,6 +113,25 @@ namespace WorldCup.WinForm
             _configService.Save();
         }
 
+
+
+        //for esc and enter keys on keyboard
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Enter)
+            {
+                btnSave.PerformClick(); // Simulate Save button click
+                return true; // Mark key as handled
+            }
+            else if (keyData == Keys.Escape)
+            {
+                btnCancel.PerformClick(); // Simulate Cancel button click
+                return true; // Mark key as handled
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData); // Default processing
+        }
+
         private void SettingsForm_Load(object sender, EventArgs e)
         {
 

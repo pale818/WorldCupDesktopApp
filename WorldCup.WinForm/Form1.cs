@@ -539,17 +539,58 @@ namespace WorldCup.WinForm
         }
 
         //FOR CLOSING
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            var result = MessageBox.Show(_localizationService["exitQuestion"], "OK",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
-
-            if (result == DialogResult.No)
+            if (keyData == Keys.Enter)
             {
-                e.Cancel = true; // prevent closing
+                AttemptClose(); // Show confirmation
+                return true;
+            }
+            else if (keyData == Keys.Escape)
+            {
+                AttemptClose();
+                return true; // Mark key as handled
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void AttemptClose()
+        {
+            if (ConfirmExit())
+            {
+                this.Close();
+            }
+            else
+            {
+                DialogResult = DialogResult.Cancel;
+                Close();
             }
         }
 
+        private bool ConfirmExit()
+        {
+            var result = MessageBox.Show(
+                _localizationService["exitQuestion"],
+                "Exit",
+                MessageBoxButtons.OKCancel,
+                MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button1
+            );
+
+            return result == DialogResult.OK;
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!ConfirmExit())
+            {
+                e.Cancel = true;
+            }
+        }
+
+
+        //FOR SETTINGS 
 
         private async void btnSettings_Click(object sender, EventArgs e)
         {
