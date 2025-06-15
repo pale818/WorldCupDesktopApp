@@ -29,8 +29,8 @@ namespace WorldCup.WPF
 
             //cmbResolution.SelectedIndex = 0; // Default to 1024x768
 
-            System.Diagnostics.Debug.WriteLine($"SAVED DATA SOURCE: {configService.Settings.DataSource}");
 
+            //Finds the item in cmbData that matches saved DataSource (e.g., "api"),preselects it
             foreach (ComboBoxItem item in cmbData.Items)
             {
                 if ((string)item.Content == configService.Settings.DataSource)
@@ -56,6 +56,7 @@ namespace WorldCup.WPF
 
         private void Continue_Click(object sender, RoutedEventArgs e)
         {
+            //reads choosen values
             string selected = ((ComboBoxItem)cmbResolution.SelectedItem).Content.ToString();
             string selectedData = ((ComboBoxItem)cmbData.SelectedItem).Content.ToString();
 
@@ -105,6 +106,7 @@ namespace WorldCup.WPF
             this.Close();
         }
 
+        //When user changes api/local, it’s saved immediately to settings.json
         private void cmbData_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             string selectedData = ((ComboBoxItem)cmbData.SelectedItem).Content.ToString();

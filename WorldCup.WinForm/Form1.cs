@@ -1,8 +1,9 @@
-using System.Diagnostics.Metrics;
+﻿using System.Diagnostics.Metrics;
 using System.IO;
 using System.Text.Json;
 using WorldCup.Data.Models;
 using WorldCup.Data.Services;
+using static System.ComponentModel.Design.ObjectSelectorEditor;
 
 namespace WorldCup.WinForm
 {
@@ -29,14 +30,21 @@ namespace WorldCup.WinForm
 
         private TeamStatistics statsHome;
         private TeamStatistics statsAway;
-       
 
+
+
+        /* 
+         Initializes localization and loads the language file.
+        Sets up drag-and-drop behavior for players (between favorites and normal list).
+        Sets up right-click menu for favorite players.
+        Calls ApplyLocalization() to update UI texts.
+         */
         public Form1()
         {
             InitializeComponent();
-            _localizationService = new LocalizationService();
 
-            //_confServ works with public "Settings" variable from CongifServ class
+            
+            _localizationService = new LocalizationService();
             _configService = new ConfigService();
             _settingsService = new SettingsService();
 
@@ -45,13 +53,18 @@ namespace WorldCup.WinForm
             _localizationService.LoadLanguage(_configService.Settings.Language);
 
 
-            // REMOVES FROM FAV LIST PLAYERS BY CONTEXT MENU
+            /*
+             This creates a right-click context menu for removing a favorite player
+            Menu item is translated dynamically
+            When clicked, calls the method RemoveFromFavorites_Click
+             */
             _favoritePlayerContextMenu = new ContextMenuStrip();
             _favoritePlayerContextMenu.Items.Add(_localizationService["removeFavoritePlayer"], null, RemoveFromFavorites_Click);
 
             ApplyLocalization();
 
 
+            // make drag-and-drop between the two FlowLayoutPanels
             flpPlayers.DragEnter += Panel_DragEnter;
             flpFavPlayers.DragEnter += Panel_DragEnter;
 
@@ -59,12 +72,15 @@ namespace WorldCup.WinForm
             flpFavPlayers.DragDrop += PanelFavoritePlayers_DragDrop;
 
 
-            this.DragEnter += MainForm_DragEnter;
-            this.DragDrop += MainForm_DragDrop;
         }
 
 
-        //first called func after Form1
+        /*
+         Initializes services (TeamService, MatchService)
+        Loads list of teams into cmbCountry
+        Loads favorite teams from a text file
+        Loads favorite players and displays them as controls inside flpFavPlayers
+         */
         private async void Form1_Load(object sender, EventArgs e)
         {
 
@@ -79,8 +95,7 @@ namespace WorldCup.WinForm
             await LoadTeams();
 
 
-
-            // ensure to load favourite teams from txt file into the list of fav teams
+            // load favourite teams from txt file 
             var favTeamFile = "./Data/favourite_teams.txt";
             if (File.Exists(favTeamFile))
             {
@@ -98,6 +113,14 @@ namespace WorldCup.WinForm
             flpFavPlayers.Controls.Clear();
 
 
+
+            /*
+             For each player:
+            Create a PlayerControl (custom user control showing name, shirt number, etc.)
+            Add some margin around it
+            Assign right-click menu (Remove from Favorites)
+            Add it visually to flpFavPlayers
+             */
             foreach (var p in _favoritePlayers)
             {
                 try
@@ -117,10 +140,10 @@ namespace WorldCup.WinForm
         }
 
 
-        //DRAG AND DROP FUNCTIONS:
+        //DRAG AND DROP FUNCTIONS: Handles dragging player controls between: flpPlayers - flpFavPlayers
 
 
-        //when you first click on the panel
+        // gets triggered when an item is clicked on
         private void Panel_DragEnter(object sender, DragEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine($"DRAG ENTER e {e}");
@@ -167,6 +190,10 @@ namespace WorldCup.WinForm
         //drag from favourite and return to original box
         private void PanelPlayers_DragDrop(object sender, DragEventArgs e)
         {
+
+            System.Diagnostics.Debug.WriteLine($"DRAG DROP TO ORIGINAL e {e}");
+
+
             if (e.Data != null && e.Data.GetData(typeof(PlayerControl)) is PlayerControl control)
             {
                 var player = control.PlayerData;
@@ -195,40 +222,7 @@ namespace WorldCup.WinForm
             }
         }
 
-
-        private void MainForm_DragEnter(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(typeof(PlayerControl)))
-                e.Effect = DragDropEffects.Move;
-            else
-                e.Effect = DragDropEffects.None;
-        }
-
-        private void MainForm_DragDrop(object sender, DragEventArgs e)
-        {
-            if (e.Data != null && e.Data.GetData(typeof(PlayerControl)) is PlayerControl control)
-            {
-                var player = control.PlayerData;
-
-                // Check if it's currently in favorites
-                if (control.IsFavourite)
-                {
-                    flpFavPlayers.Controls.Remove(control);
-
-                    control.SetFavourite(false);
-                    control.ContextMenuStrip = null;
-
-                    _favoritePlayers.RemoveAll(p => p.Name == player.Name);
-                    _settingsService.SaveFavoritePlayers(_favoritePlayers);
-
-                    MessageBox.Show($"{player.Name} {_localizationService["playerRemovedFromFavouite"]}");
-                    loadPlayers();
-                }
-            }
-        }
-
-
-
+        //LANGUAGE
 
         //changes the names of lables,buttons etc based on lang
         private void ApplyLocalization()
@@ -261,6 +255,11 @@ namespace WorldCup.WinForm
 
 
         //based on choosen gender "Country" combo box is filled with teams 
+        /*
+         Reads gender setting from config
+        Calls the API or loads local file using TeamService
+        Fills cmbCountry with team names ("CRO - Croatia")
+         */
         private async Task LoadTeams()
         {
             _configService.LoadConfig();
@@ -284,7 +283,7 @@ namespace WorldCup.WinForm
             }
         }
 
-
+       
         private void RemoveFromFavorites_Click(object sender, EventArgs e)
         {
             // The 'sender' is the ToolStripMenuItem that was clicked.
@@ -329,6 +328,11 @@ namespace WorldCup.WinForm
 
 
 
+        /*
+        Removes teams from the list box lstFavTeam
+        Saves the updated list to favourite_teams.txt
+        */
+
         //ADD TEAM 
         private void btnAddTeam_Click(object sender, EventArgs e)
         {
@@ -354,8 +358,6 @@ namespace WorldCup.WinForm
         //REMOVE FAV TEAMS
         private void btnRemoveTeam_Click(object sender, EventArgs e)
         {
-
-
             var selectedIndex = lstFavTeam.SelectedIndex;
 
 
@@ -377,6 +379,11 @@ namespace WorldCup.WinForm
 
 
         //LOAD MATCHES BUTTON
+        /*
+        Uses MatchService.GetMatchesForTeamAsync() to load matches based on selected team and gender
+        Parses FIFA code from selected item in cmbCountry
+        Populates lstMatches with match info (stage + teams)
+         */
         private async void btnMatches_Click(object sender, EventArgs e)
         {
             // fetch from cmbGender value, converts into string and in case nothing is found takes "man"
@@ -392,8 +399,6 @@ namespace WorldCup.WinForm
 
             // extracts fifaCode from the string, splits by "-" and takes first part (e.g. CRO-Croatia, only CRO)
             var fifaCode = selectedTeam.Split('-')[0].Trim();
-
-
             try
             {
                 // fetches all matches for specific gender and team and saves it to _matches list
@@ -412,10 +417,8 @@ namespace WorldCup.WinForm
                 System.Diagnostics.Debug.WriteLine("LoadMatches error: " + ex.Message);
                 return;
             }
-
             // clears list 
             lstMatches.Items.Clear();
-
             // fills list of matches 
             foreach (var match in _matches)
             {
@@ -425,6 +428,12 @@ namespace WorldCup.WinForm
 
 
         //LOAD PLAYERS BUTTON
+        /*
+        Gets the selected match from lstMatches
+        Based on selected team (home/away), shows players from that side
+        Skips players already in favorites
+        Adds PlayerControl components to flpPlayers
+         */
         private void btnPlayers_Click(object sender, EventArgs e)
         {
             loadPlayers();
@@ -432,15 +441,16 @@ namespace WorldCup.WinForm
 
         private void loadPlayers()
         {
-
+            //Get the selected match
             var selectedIndex = lstMatches.SelectedIndex;
             if (selectedIndex == -1) return;
 
+            //Read match data and store home/away stats
             var selectedMatch = _matches[selectedIndex];
             statsHome = selectedMatch.HomeTeamStatistics;
             statsAway = selectedMatch.AwayTeamStatistics;
 
-            // set fifa code in 
+            //Fill cmbShowTeam with both teams
             cmbShowTeam.Items.Clear();
             cmbShowTeam.Items.AddRange(new[] { statsHome.Country, statsAway.Country });
             // set defualt to the first team
@@ -453,9 +463,9 @@ namespace WorldCup.WinForm
                 stats = statsAway;
             }
 
+            //If the selected country is actually the away team, swap the home/ away stats
             var fifaCode = cmbCountry.SelectedItem?.ToString().Split('-')[0].Trim();
             System.Diagnostics.Debug.WriteLine($"fifaCode {fifaCode}");
-
             if (selectedMatch.AwayTeam.Code == fifaCode)
             {
                 statsHome = selectedMatch.AwayTeamStatistics;
@@ -470,13 +480,15 @@ namespace WorldCup.WinForm
 
             List<Player> _allPlayers = new();
 
+
+            //debug
             var homeTeam = JsonSerializer.Serialize(statsHome, new JsonSerializerOptions { WriteIndented = true });
             var awayTeam = JsonSerializer.Serialize(statsAway, new JsonSerializerOptions { WriteIndented = true });
-
             System.Diagnostics.Debug.WriteLine($"statsHome: {homeTeam}");
             System.Diagnostics.Debug.WriteLine($"statsAway: {awayTeam}");
 
 
+            //combines all players
             _allPlayersInMatch = stats.StartingEleven.Concat(stats.Substitutes).ToList();
           
 
@@ -503,6 +515,8 @@ namespace WorldCup.WinForm
             }
         }
 
+
+        //Switches between home and away players
         private void cmbShowTeam_SelectedIndexChanged(object sender, EventArgs e)
         {
             System.Diagnostics.Debug.WriteLine($"Coubtry {cmbShowTeam.SelectedItem}");
@@ -541,17 +555,11 @@ namespace WorldCup.WinForm
         //FOR CLOSING
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (keyData == Keys.Enter)
+            if (keyData == Keys.Enter || keyData == Keys.Escape)
             {
                 AttemptClose(); // Show confirmation
                 return true;
             }
-            else if (keyData == Keys.Escape)
-            {
-                AttemptClose();
-                return true; // Mark key as handled
-            }
-
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
@@ -591,7 +599,11 @@ namespace WorldCup.WinForm
 
 
         //FOR SETTINGS 
-
+        /*
+         Opens SettingsForm
+        After closing, reloads config and UI localization
+        Reloads team list
+         */
         private async void btnSettings_Click(object sender, EventArgs e)
         {
             using (var form = new SettingsForm())

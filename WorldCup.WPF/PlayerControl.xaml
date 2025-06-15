@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:WorldCup.WPF"
              mc:Ignorable="d" 
              Width="120" Height="55">
-    <StackPanel Background="Transparent" Orientation="Vertical" >
+    <StackPanel Background="Transparent" Orientation="Vertical" MouseLeftButtonDown="PlayerInfo_Click">
         <Border Background="White" Width="40" Height="40" CornerRadius="40" BorderBrush="Black" BorderThickness="1">
             <TextBlock x:Name="txtPlayerShirt"
                Text="Shirt"

@@ -20,11 +20,31 @@ namespace WorldCup.WPF
     /// </summary>
     public partial class PlayerControl : UserControl
     {
-        public PlayerControl(string playerName, string playerShirt)
+
+        private string _playerName;
+        private string _playerShirt;
+        private string _playerPosition;
+        private bool _isCaptain;
+        public PlayerControl(string playerName, string playerShirt, string playerPosition, bool isCaptain)
         {
             InitializeComponent();
             txtPlayerName.Text = playerName;
             txtPlayerShirt.Text = playerShirt;
+
+            _playerName = playerName;
+            _playerShirt = playerShirt;
+            _playerPosition = playerPosition;
+            _isCaptain = isCaptain;
+
+
         }
+
+        private void PlayerInfo_Click(object sender, MouseButtonEventArgs e)
+        {
+            var infoWindow = new PlayerInfo(_playerName, _playerShirt,_playerPosition,_isCaptain);
+            infoWindow.Owner = Window.GetWindow(this);
+            infoWindow.ShowDialog();
+        } 
+
     }
 }

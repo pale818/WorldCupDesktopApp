@@ -16,6 +16,12 @@ namespace WorldCup.WinForm
         private ConfigService _configService;
         private LocalizationService _localizationService;
 
+
+        /*
+         Initializes the form
+        Loads localization service (for labels/buttons)
+        Loads current saved settings from settings.json
+         */
         public SettingsForm()
         {
             InitializeComponent();
@@ -38,6 +44,7 @@ namespace WorldCup.WinForm
         }
 
 
+        //Saves new gender when changed.
         private void cmbGender_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedGender = cmbGender.SelectedItem?.ToString();
@@ -49,6 +56,8 @@ namespace WorldCup.WinForm
                 _configService.Save(); // persist to settings.json
             }
         }
+
+        //Saves new language, reloads localization, and updates UI text
 
         private void cmbLanguage_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -76,7 +85,7 @@ namespace WorldCup.WinForm
 
 
 
-
+        //Reads values from dropdowns, saves to config
         private void btnSave_Click(object sender, EventArgs e)
         {
             var gender = cmbGender.SelectedItem?.ToString();
@@ -97,7 +106,7 @@ namespace WorldCup.WinForm
             _configService.Save();
 
 
-            DialogResult = DialogResult.OK;
+            DialogResult = DialogResult.OK; // DialogResult.OK closes the form so the caller can refresh UI
             Close();
         }
 
@@ -107,6 +116,9 @@ namespace WorldCup.WinForm
             Close();
         }
 
+
+        //Saves "api" or "local" as the current data source
+        //All changes are saved immediately to settings.json
         private void cmbData_SelectedIndexChanged(object sender, EventArgs e)
         {
             _configService.Settings.DataSource = cmbData.SelectedItem.ToString() ?? "api";
@@ -115,7 +127,7 @@ namespace WorldCup.WinForm
 
 
 
-        //for esc and enter keys on keyboard
+        //Keyboard shortcut handling
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Enter)

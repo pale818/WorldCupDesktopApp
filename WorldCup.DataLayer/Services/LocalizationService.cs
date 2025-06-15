@@ -14,10 +14,13 @@ namespace WorldCup.Data.Services
         public void LoadLanguage(string langCode)
         {
 
+            //path  based on if en or hr is choosen
             var path = $"./Lang/lang_{langCode}.json";
             if (File.Exists(path))
             {
+                //read from file and saved to var json
                 var json = File.ReadAllText(path);
+                //transforms from json file to dictionary like teams[0].Country = "Croatia";
                 _translations = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
             }
             else
@@ -28,6 +31,10 @@ namespace WorldCup.Data.Services
             //System.Diagnostics.Debug.WriteLine(("Exists: " + File.Exists(path)));
         }
 
+        //If _translations is not null AND it contains the given key,return the value for that key.Otherwise, just return
+        //the key itself.
+        // If _translations has "favouriteTeam" key → return its translation value
+        // If not → return "favouriteKey"
         public string this[string key] => _translations?.ContainsKey(key) == true ? _translations[key] : key;
     }
 }

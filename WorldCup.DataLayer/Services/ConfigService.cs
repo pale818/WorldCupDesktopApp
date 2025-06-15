@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Threading.Channels;
 using WorldCup.Data.Models;
 
 namespace WorldCup.Data.Services;
@@ -6,26 +7,32 @@ namespace WorldCup.Data.Services;
 public class ConfigService
 {
 
-    //used to "remeber" the last chosen gender,lang.....
-    private const string ConfigPath = "settings.json"; // adjust path if needed
+    //Defines the file name where the settings are stored.
+    private const string ConfigPath = "settings.json";
 
+    //This holds the current settings in memory, so other parts of the app can read it (but not set it directly).
     public ConfigSettings Settings { get; private set; }
 
     public ConfigService()
     {
         if (File.Exists(ConfigPath))
         {
+            // deserializes (loads) the JSON content into the Settings object.
             var json = File.ReadAllText(ConfigPath);
             Settings = JsonSerializer.Deserialize<ConfigSettings>(json) ?? new ConfigSettings();
         }
         else
         {
+            //it creates a new default ConfigSettings object and saves it to disk.
             Settings = new ConfigSettings();
-            Save(); // save default if missing
+            Save(); 
         }
     }
 
-    // Loads data from the file into Settings variable
+
+    //Reloads the settings from file (if it exists).
+    //this can be used to re-load settings later, e.g.
+    //if the file is changed in another form (SettingsFrom in my case)
     public void LoadConfig()
     {
         if (File.Exists(ConfigPath))
@@ -35,7 +42,7 @@ public class ConfigService
         }
     }
 
-    //saves the current values in settings obj to json form
+    //Converts the current Settings object to JSON and writes it to settings.json.
     public void Save()
     {
         var json = JsonSerializer.Serialize(Settings, new JsonSerializerOptions { WriteIndented = true });

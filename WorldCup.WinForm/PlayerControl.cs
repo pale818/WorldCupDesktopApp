@@ -1,8 +1,11 @@
-﻿using System.Numerics;
+﻿using System.Drawing;
+using System.Numerics;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WorldCup.Data.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WorldCup.WinForm
 {
@@ -16,7 +19,7 @@ namespace WorldCup.WinForm
 
         //for starting the drag and drop process
         private bool _isDragging = false;
-        private Point _dragStartPoint; //coordinates of a player you choose
+        //private Point _dragStartPoint; //coordinates of a player you choose
 
 
         public PlayerControl(Player playerData, bool isFavourite)
@@ -28,7 +31,7 @@ namespace WorldCup.WinForm
             lblPlayerInfo.Text = $"{PlayerData.ShirtNumber} - {PlayerData.Name} ({PlayerData.Position})" +
             (PlayerData.Captain ? " 🧢" : "");
 
-            // try to find player image
+            // try to find players image
             string fileName = PlayerData.Name.ToLower().Replace(" ", "_") + ".jpg";
             string fullPath = Path.Combine("Assets", fileName);
             string fallbackPath = Path.Combine("Assets", "personDefault.jpg");
@@ -48,8 +51,9 @@ namespace WorldCup.WinForm
                 }
             }
 
-            this.MouseDown += PlayerControl_MouseDown;
-            this.MouseMove += PlayerControl_MouseMove;
+            this.MouseDown += PlayerControl_MouseDown; //Stores the starting mouse location when user presses the mouse
+            this.MouseMove += PlayerControl_MouseMove; //If dragging is active and mouse is moved with the left button, starts DoDragDrop
+
         }
 
 
@@ -58,7 +62,7 @@ namespace WorldCup.WinForm
             System.Diagnostics.Debug.WriteLine($"PC MOUSE DOWN e {e}");
 
             _isDragging = true;
-            _dragStartPoint = e.Location;
+            //_dragStartPoint = e.Location;
         }
 
         private void PlayerControl_MouseMove(object sender, MouseEventArgs e)
@@ -73,7 +77,7 @@ namespace WorldCup.WinForm
 
             System.Diagnostics.Debug.WriteLine(e.Button);
         }
-
+       
 
         public void SetFavourite(bool favorite)
         {

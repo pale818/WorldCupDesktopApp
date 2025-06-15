@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WorldCup.WPF"
         mc:Ignorable="d"
-        Title="MainWindow">
+        Title="MainWindow" Height="540">
 
+    <!-- a fade-in animation when the app loads-->
     <Window.Triggers>
         <EventTrigger RoutedEvent="Window.Loaded">
             <BeginStoryboard>

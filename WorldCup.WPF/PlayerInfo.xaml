@@ -1,0 +1,23 @@
+﻿<Window x:Class="WorldCup.WPF.PlayerInfo"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Player Info" Height="200" Width="300">
+
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Window.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                From="0" To="1" Duration="0:0:0.3"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
+    
+    <StackPanel Margin="10">
+        <TextBlock x:Name="txtName" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+        <TextBlock x:Name="txtShirt" FontSize="14" />
+        <TextBlock x:Name="txtPosition" FontSize="14" />
+        <TextBlock x:Name="txtCaptain" FontSize="14" />
+    </StackPanel>
+</Window>

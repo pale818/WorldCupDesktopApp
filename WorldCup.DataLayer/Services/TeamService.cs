@@ -9,6 +9,11 @@ public class TeamService
     private readonly ConfigService _config;
     private readonly JsonSerializerOptions _jsonOptions;
 
+
+    /*
+     Initializes an HttpClient for making API calls.
+    Stores a reference to the provided ConfigService to read the current data source ("local" or "api").
+     */
     public TeamService(ConfigService configService)
     {
         _httpClient = new HttpClient();
@@ -35,14 +40,11 @@ public class TeamService
 
         teams[0].Country = "Croatia";
         teams[0].FifaCode = "CRO";
-
-        teams[1].Country = "Brazil";
-        teams[1].FifaCode = "BRA";
      */
-    //Console.WriteLine($"GetTeamsAsync: JsonSerializer {JsonSerializer.Deserialize<List<Team>>(response, _jsonOptions)}");
+   
     public async Task<List<Team>> GetTeamsAsync(string gender = "men")
     {
-        System.Diagnostics.Debug.WriteLine($"DataSource {_config.Settings.DataSource}");
+        //System.Diagnostics.Debug.WriteLine($"DataSource {_config.Settings.DataSource}");
 
         try
         {
@@ -54,6 +56,7 @@ public class TeamService
 
                 if (File.Exists(file))
                 {
+                    //Deserializes JSON into a List<Team>
                     var json = await File.ReadAllTextAsync(file);
                     return JsonSerializer.Deserialize<List<Team>>(json, _jsonOptions) ?? new();
                 }
@@ -62,6 +65,7 @@ public class TeamService
                 return new(); // empty list fallback
             }
 
+            //API
             var url = $"{BaseUrl(gender)}/teams";
             System.Diagnostics.Debug.WriteLine($"[GetTeamsAsync] API URL: {url}");
 
@@ -90,7 +94,7 @@ public class TeamService
 
     public async Task<List<TeamResult>> GetTeamResultsAsync(string gender = "men")
     {
-        System.Diagnostics.Debug.WriteLine($"DataSource {_config.Settings.DataSource}");
+        //System.Diagnostics.Debug.WriteLine($"DataSource {_config.Settings.DataSource}");
 
         try
         {
@@ -132,7 +136,7 @@ public class TeamService
     public async Task<List<GroupResult>> GetGroupResultsAsync(string gender = "men")
     {
 
-        System.Diagnostics.Debug.WriteLine($"DataSource {_config.Settings.DataSource}");
+        //System.Diagnostics.Debug.WriteLine($"DataSource {_config.Settings.DataSource}");
 
         try
         {

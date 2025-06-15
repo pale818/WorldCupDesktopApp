@@ -8,15 +8,15 @@ using WorldCup.Data.Services;
 using System.IO;
 using System.Windows.Media.Animation;
 using System.Text.Json;
+using System;
+
+
 namespace WorldCup.WPF
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+     public partial class MainWindow : Window
     {
 
-
+        
         private ConfigService _configService;
         private TeamService _teamService;
         private MatchService _matchService;
@@ -46,19 +46,18 @@ namespace WorldCup.WPF
         private List<Player> _favoritePlayers = new();
         private List<Player> _allPlayersInMatch = new();
 
+
         public MainWindow()
         {
+            //Loads  MainWindow.xaml file
             InitializeComponent();
 
 
-            _configService = new ConfigService();
-
-            //use Config because of gender change
-            _teamService = new TeamService(_configService);
-            _matchService = new MatchService(_configService);
-
-            _settingsService = new SettingsService();
-            _localizationService = new LocalizationService();
+            _configService = new ConfigService(); //for basic settings
+            _teamService = new TeamService(_configService); //loads teams
+            _matchService = new MatchService(_configService); //loads matches
+            _settingsService = new SettingsService(); //saves/loads fav players/teams
+            _localizationService = new LocalizationService(); //translation
 
 
             cmbGender.Items.Add("men");
@@ -81,11 +80,15 @@ namespace WorldCup.WPF
             btnLoadPlayers.Click += BtnLoadPlayers_Click;
             btnAddFavoriteTeam.Click += BtnAddFavoriteTeam_Click;
             cmbLanguage.SelectionChanged += CmbLanguage_SelectionChanged;
-
             btnHomeStat.Click += BtnLoadHomeStat_Click;
             btnAwayStat.Click += BtnLoadAwayStat_Click;
 
-            // Instantiate the ContextMenu
+     
+            /*
+             right-click menus for:
+            Removing/adding favorite players
+            Removing/viewing info about teams
+             */
             _favoritePlayerRemoveContextMenu = new ContextMenu();
             _favoritePlayerAddContextMenu = new ContextMenu();
             _favoriteTeamRemoveContextMenu = new ContextMenu();
@@ -119,14 +122,20 @@ namespace WorldCup.WPF
 
 
 
-
+            //triggers the starting of app and closing
             this.Closing += MainWindow_Closing;
             this.Loaded += MainWindow_Loaded;
+            this.PreviewKeyDown += MainWindow_PreviewKeyDown;
+
 
             // when canvasPlayers detect change in height or width calls DisplayPlayersOnField
-            canvasPlayers.SizeChanged += (s, e) => DisplayPlayersOnField();
+            if (statsHome != null && statsAway != null)
+            {
+                canvasPlayers.SizeChanged += (s, e) => DisplayPlayersOnField(statsHome.Tactics, statsAway.Tactics);
+            }
 
         }
+
 
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -135,16 +144,52 @@ namespace WorldCup.WPF
             LoadFavoriteTeams();
             LoadFavoritePlayers();
         }
+        //Confirms exit when user closes the app
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            var result = MessageBox.Show(_localizationService["exitQuestion"], "OK",
-                MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.No)
+            if (!ConfirmExit())
             {
                 e.Cancel = true;
             }
         }
+        
+        //closing with esc and enter buttons
+        private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+
+            if (e.Key == Key.Enter || e.Key == Key.Escape)
+            {
+                e.Handled = true;
+                AttemptClose();
+            }
+        }
+        private void AttemptClose()
+        {
+            if (ConfirmExit())
+            {
+                this.Close();
+            }
+            else
+            {
+                Close();
+            }
+  
+        }
+
+        private bool ConfirmExit()
+        {
+            var result = MessageBox.Show(
+                _localizationService["exitQuestion"],
+                "Exit",
+                MessageBoxButton.OKCancel,
+                MessageBoxImage.Question,
+                MessageBoxResult.OK
+            );
+
+            return result == MessageBoxResult.OK;
+        }
+
+
 
         // STATISTIC WINDOW
         private void BtnLoadHomeStat_Click(object sender, RoutedEventArgs e)
@@ -189,6 +234,7 @@ namespace WorldCup.WPF
 
 
         //CHANGES LABEL,BUTTON ETC. LANGUAGE
+        //Updates UI dynamically when language changes (CmbLanguage_SelectionChanged)
         public void ApplyLocalization()
         {
             this.Title = _localizationService["title"];
@@ -230,7 +276,11 @@ namespace WorldCup.WPF
             }
         }
 
-        private  async Task LoadTeams()
+        /*
+        Populates cmbChoosenTeam from API/local file using gender
+        Falls back to default if no team selected
+        */
+        private async Task LoadTeams()
         {
             try
             {
@@ -238,7 +288,6 @@ namespace WorldCup.WPF
                 System.Diagnostics.Debug.WriteLine(gender);
 
                 _teams = await _teamService.GetTeamsAsync(gender);
-
                 System.Diagnostics.Debug.WriteLine(_teams);
             } catch (Exception ex) {
                 MessageBox.Show(_localizationService["dataLoadingError"]);
@@ -258,6 +307,10 @@ namespace WorldCup.WPF
 
 
         //LOAD MATCHES AFTER TEAM IS SELECTED 
+        /*
+        Uses TeamService + MatchService to fetch matches
+        Fills lstMatches
+         */
         private async void BtnLoadMatches_Click(object sender, RoutedEventArgs e)
         {
             var gender = cmbGender.SelectedItem?.ToString() ?? "men";
@@ -290,12 +343,15 @@ namespace WorldCup.WPF
             var selectedIndex = lstMatches.SelectedIndex;
             if (selectedIndex == -1) return;
 
+            //saves full player stats for both teams into statsHome and statsAway
             var selectedMatch = _matches[selectedIndex];
             statsHome = selectedMatch.HomeTeamStatistics;
             statsAway = selectedMatch.AwayTeamStatistics;
+
             var fifaCode = cmbChoosenTeam.SelectedItem?.ToString().Split('-')[0].Trim();
             System.Diagnostics.Debug.WriteLine($"fifaCode ${fifaCode}");
 
+            //swap home/away stats if needed
             if (selectedMatch.AwayTeam.Code == fifaCode)
             {
                 statsHome = selectedMatch.AwayTeamStatistics;
@@ -316,15 +372,14 @@ namespace WorldCup.WPF
             System.Diagnostics.Debug.WriteLine($"statsHome: {homeTeam}");
             System.Diagnostics.Debug.WriteLine($"statsAway: {awayTeam}");
 
+            //Updates team names and match score labels
             lblHomeTeam.Content = statsHome.Country;
             lblAwayTeam.Content = statsAway.Country;
-
-
             lblScoreHomeTeam.Content = selectedMatch.HomeTeam.Goals;
             lblScoreAwayTeam.Content = selectedMatch.AwayTeam.Goals;
 
+            //all home team players
             _allPlayersInMatch = statsHome.StartingEleven.Concat(statsHome.Substitutes).ToList();
-
             // list of teams on the field
             _currentHomePlayers = statsHome.StartingEleven.ToList();
             _currentAwayPlayers = statsAway.StartingEleven.ToList();
@@ -348,73 +403,133 @@ namespace WorldCup.WPF
 
 
             // Display on field
-            DisplayPlayersOnField();
+            DisplayPlayersOnField(statsHome.Tactics, statsAway.Tactics);
         }
 
 
-        private void DisplayPlayersOnField()
+        //DISPLAYING PLAYERS ON FIELD
+        private void DisplayPlayersOnField(string currentHomeFormation, string currentAwayFormation)
         {
+            // Clears the canvas
             canvasPlayers.Children.Clear();
 
+            // gets current field dimensions
             double fieldWidth = canvasPlayers.ActualWidth;
             double fieldHeight = canvasPlayers.ActualHeight;
 
             if (fieldWidth == 0 || fieldHeight == 0)
                 return;
 
-            List<Point> homeLayout = new()
-           {
-               new Point(0.0, 0.5), new Point(0.1, 0.2), new Point(0.1, 0.4),
-               new Point(0.1, 0.6), new Point(0.1, 0.8), new Point(0.2, 0.25),
-               new Point(0.2, 0.5), new Point(0.2, 0.75), new Point(0.30, 0.2),
-               new Point(0.30, 0.5), new Point(0.30, 0.8)
-           };
+            // Calls GetFormationLayout() twice: for home and away
+            //gets "point" in rows
+            List<Point> homeLayout = GetFormationLayout(currentHomeFormation, "home");
+            List<Point> awayLayout = GetFormationLayout(currentAwayFormation, "away");
 
-            List<Point> awayLayout = new()
-           {
-               new Point(0.9, 0.5), new Point(0.8, 0.2), new Point(0.8, 0.4),
-               new Point(0.8, 0.6), new Point(0.8, 0.8), new Point(0.7, 0.25),
-               new Point(0.7, 0.5), new Point(0.7, 0.75), new Point(0.6, 0.2),
-               new Point(0.6, 0.5), new Point(0.6, 0.8)
-           };
 
-            void AddPlayers(List<Player> players, List<Point> layout)
-            {
-                for (int i = 0; i < players.Count && i < layout.Count; i++)
-                {
-                    var player = players[i];
-                    string playerName = $"{player.Name}";
-                    string playerShirt = $"{player.ShirtNumber}";
-                    var control = new PlayerControl(playerName, playerShirt) { Opacity = 0 };
-
-                    double x = layout[i].X * fieldWidth;
-                    double y = layout[i].Y * fieldHeight;
-
-                    Canvas.SetLeft(control, x);
-                    Canvas.SetTop(control, y);
-                    canvasPlayers.Children.Add(control);
-
-                    var fadeIn = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(0.5),
-                        BeginTime = TimeSpan.FromSeconds(i * 0.2)
-                    };
-                    Storyboard.SetTarget(fadeIn, control);
-                    Storyboard.SetTargetProperty(fadeIn, new PropertyPath("Opacity"));
-
-                    var sb = new Storyboard();
-                    sb.Children.Add(fadeIn);
-                    sb.Begin();
-                }
-            }
-
-            AddPlayers(_currentHomePlayers, homeLayout);
-            AddPlayers(_currentAwayPlayers, awayLayout);
+            AddPlayers(_currentHomePlayers, homeLayout, fieldWidth, fieldHeight);
+            AddPlayers(_currentAwayPlayers, awayLayout, fieldWidth, fieldHeight);
         }
 
 
+        //takes a list of Player objects and a list of layout points, calculates their actual positions on the canvas
+        private void  AddPlayers(List<Player> players, List<Point> layout, double fieldWidth, double fieldHeight)
+        {
+            for (int i = 0; i < players.Count && i < layout.Count; i++)
+            {
+                var player = players[i];
+                string playerName = $"{player.Name}";
+                string playerShirt = $"{player.ShirtNumber}";
+                var control = new PlayerControl(playerName, playerShirt,player.Position,player.Captain) { Opacity = 0 };
+
+                // Convert the normalized layout coordinates (0–1) to actual pixel positions based on canvas size
+                double x = layout[i].X * fieldWidth;
+                double y = layout[i].Y * fieldHeight;
+
+                Canvas.SetLeft(control, x);
+                Canvas.SetTop(control, y);
+                canvasPlayers.Children.Add(control);
+
+                //Begins with a delay based on the index (i * 0.2) for a staggered effect
+                var fadeIn = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.5),
+                    BeginTime = TimeSpan.FromSeconds(i * 0.2)
+                };
+
+                // Attach the animation to the player control’s Opacity property
+                Storyboard.SetTarget(fadeIn, control);
+                Storyboard.SetTargetProperty(fadeIn, new PropertyPath("Opacity"));
+
+                var sb = new Storyboard();
+                sb.Children.Add(fadeIn);
+                sb.Begin();
+            }
+        }
+
+        private List<Point> GetFormationLayout(string formation, string teamSide)
+        {
+           
+            bool isHome = teamSide.ToLower() == "home";
+
+            // Define the team's half of the field
+            double halfStartX = isHome ? 0.0 : 0.51;
+            double halfEndX = isHome ? 0.49 : 1.0;
+
+            //Parse formation string like "4-4-2" into a list of integers: [4, 4, 2]
+            var lines = formation.Split('-').Select(int.Parse).ToList();
+            //Count how many horizontal lines of players (excluding the goalkeeper)
+            int totalLines = lines.Count;
+
+            // Determine how much horizontal space each formation line gets
+            double usableWidth = Math.Abs(halfEndX - halfStartX);
+            double stepX = usableWidth / (totalLines + 1);
+
+            List<Point> layout = new();
+
+            if (isHome)
+            {
+                //lace the goalkeeper slightly ahead of the goal line, centered vertically at Y=0.5
+                double goalieX = halfStartX + stepX * 0.5;
+                layout.Add(new Point(goalieX, 0.5));
+
+                for (int lineIndex = 0; lineIndex < totalLines; lineIndex++)
+                {
+                    int playersInLine = lines[lineIndex];
+                    double x = halfStartX + stepX * (lineIndex + 1); //x= horizontal placement
+                    double spacing = 1.0 / (playersInLine + 1); //spacing= vertical separation
+
+                    //each player in line, evenly spaced verticaly
+                    for (int i = 0; i < playersInLine; i++)
+                    {
+                        double y = spacing * (i + 1);
+                        layout.Add(new Point(x, y));
+                    }
+                }
+            }
+            else //for the away team
+            {
+                // Away team goalkeeper shifted left (closer to goal) by 1 row
+                double goalieX = halfEndX - stepX * 1.5;
+                layout.Add(new Point(goalieX, 0.5));
+
+                for (int lineIndex = 0; lineIndex < totalLines; lineIndex++)
+                {
+                    int playersInLine = lines[lineIndex];
+                    double x = halfEndX - stepX * (lineIndex + 2); // shift left toward center
+                    double spacing = 1.0 / (playersInLine + 1);
+
+                    for (int i = 0; i < playersInLine; i++)
+                    {
+                        double y = spacing * (i + 1);
+                        layout.Add(new Point(x, y));
+                    }
+                }
+            }
+
+            return layout;
+        }
 
         //ADDS AND REMOVES FAVOURITE TEAM AND SAVES IT TO FILE
         private void BtnAddFavoriteTeam_Click(object sender, RoutedEventArgs e)
