@@ -91,7 +91,6 @@ namespace WorldCup.WPF
                     break;
                 case "Fullscreen":
                     main.WindowState = WindowState.Maximized;
-                    main.WindowStyle = WindowStyle.None;
                     break;
             }
 

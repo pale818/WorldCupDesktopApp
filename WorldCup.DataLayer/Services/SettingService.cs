@@ -7,7 +7,7 @@ public class SettingsService
 {
     private const string FavoritePlayersPath = "favorites.json";
     //private const string FavoriteTeamPath = "favorite_team.txt";
-    private const string ConfigPath = "app_config.json";
+    //private const string ConfigPath = "app_config.json";
 
 
 
@@ -41,7 +41,7 @@ public class SettingsService
 
 
     //Reads the app's configuration from app_config.json
-    public AppConfig LoadAppConfig()
+    /*public AppConfig LoadAppConfig()
     {
         if (!File.Exists(ConfigPath))
             return new AppConfig(); // default if no file yet
@@ -57,5 +57,5 @@ public class SettingsService
         var json = JsonSerializer.Serialize(config, _jsonOptions);
         File.WriteAllText(ConfigPath, json);
     }
-
+    */
 }

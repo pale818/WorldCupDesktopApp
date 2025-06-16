@@ -413,7 +413,7 @@ namespace WorldCup.WPF
             // Clears the canvas
             canvasPlayers.Children.Clear();
 
-            // gets current field dimensions
+            // gets current field dimensions, for responsivnes
             double fieldWidth = canvasPlayers.ActualWidth;
             double fieldHeight = canvasPlayers.ActualHeight;
 
@@ -468,6 +468,7 @@ namespace WorldCup.WPF
             }
         }
 
+        //logical representation of positions(3-2-3)
         private List<Point> GetFormationLayout(string formation, string teamSide)
         {
            

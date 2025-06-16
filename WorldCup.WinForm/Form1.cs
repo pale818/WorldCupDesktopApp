@@ -177,7 +177,7 @@ namespace WorldCup.WinForm
                 flpFavPlayers.Controls.Add(control);
                 control.ContextMenuStrip = _favoritePlayerContextMenu;
 
-                // Update favorite list
+                // Update favorite list file
                 var player = control.PlayerData;
                 if (!_favoritePlayers.Any(p => p.Name == player.Name))
                     _favoritePlayers.Add(player);
@@ -439,6 +439,7 @@ namespace WorldCup.WinForm
             loadPlayers();
         }
 
+        //to swithh players based on choosen country
         private void loadPlayers()
         {
             //Get the selected match
@@ -610,8 +611,6 @@ namespace WorldCup.WinForm
             {
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    // refresh UI
-                    System.Diagnostics.Debug.WriteLine("REFRESH UI");
 
 
                     _configService.LoadConfig();

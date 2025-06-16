@@ -133,6 +133,8 @@ public class TeamService
         }
     }
 
+
+    /* not used
     public async Task<List<GroupResult>> GetGroupResultsAsync(string gender = "men")
     {
 
@@ -174,4 +176,6 @@ public class TeamService
             throw new Exception("An unexpected error occurred while loading teams.");
         }
     }
+
+    */
 }
